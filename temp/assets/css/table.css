@@ -1,0 +1,7 @@
+#produitTable_length, #venteTable_lenght, #ingredient_length, #recommandationTable_lenght  {
+    margin-left: 24px;
+}
+
+#ingredient_filter, #produitTable_filter, #venteTable_filter , #recommandationTable_filter {
+    margin-right: 26px;  
+}
