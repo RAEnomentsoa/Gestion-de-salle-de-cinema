@@ -81,3 +81,8 @@ INSERT INTO showtime (cinema_id, room_id, movie_id, starts_at, ends_at, base_pri
 (3, 4, 2, '2026-01-12 10:00:00', '2026-01-12 11:40:00', 12000.00, 'CANCELED');
 
 -- Done ✅
+
+
+-- Create default admin: username=admin password=admin123
+INSERT INTO app_user (username, password_hash, full_name, role, status)
+VALUES ('admin','admin123', 'Administrateur', 'ADMIN', 'ACTIVE');

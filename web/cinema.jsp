@@ -19,6 +19,8 @@
                 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
                     <ul class="navbar-nav flex-row align-items-center ms-auto">
                         <%-- <%@ include file="user.jsp" %> --%>
+                        <a href="logout" class="btn btn-outline-danger btn-sm">Logout</a>
+
                     </ul>
                 </div>
             </nav>

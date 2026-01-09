@@ -1,3 +1,3 @@
 <%
-    response.sendRedirect("cinema");
+    response.sendRedirect("login");
 %>
