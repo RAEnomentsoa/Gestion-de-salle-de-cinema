@@ -288,6 +288,14 @@ INSERT INTO reservation (ticket_id, client_id, status) VALUES
 (1, 10, 'PAYER');
 
 
+CREATE TABLE app_user (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
 
 
 

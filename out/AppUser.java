@@ -93,7 +93,7 @@ public class AppUser {
 
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                this.setId(resultSet.getLong("user_id"));
+                this.setId(resultSet.getLong("id"));
                 this.setUsername(resultSet.getString("username"));
                 this.setPasswordHash(resultSet.getString("password_hash"));
                 this.setFullName(resultSet.getString("full_name"));
