@@ -8,12 +8,10 @@ import java.util.List;
 
 public class Showtime {
     long id; // showtime_id
-    long cinemaId;
     long roomId;
     long movieId;
     Timestamp startsAt;
     Timestamp endsAt;
-    double basePrice;
     String status; // SCHEDULED/OPEN/CLOSED/CANCELED
 
     public Showtime() {
@@ -23,26 +21,21 @@ public class Showtime {
         setId(id);
     }
 
-    public Showtime(long id, long cinemaId, long roomId, long movieId, Timestamp startsAt, Timestamp endsAt,
-            double basePrice, String status) {
+    public Showtime(long id, long roomId, long movieId, Timestamp startsAt, Timestamp endsAt, String status) {
         setId(id);
-        setCinemaId(cinemaId);
         setRoomId(roomId);
         setMovieId(movieId);
         setStartsAt(startsAt);
         setEndsAt(endsAt);
-        setBasePrice(basePrice);
         setStatus(status);
     }
 
-    public Showtime(long cinemaId, long roomId, long movieId, Timestamp startsAt, Timestamp endsAt, double basePrice,
+    public Showtime(long roomId, long movieId, Timestamp startsAt, Timestamp endsAt,
             String status) {
-        setCinemaId(cinemaId);
         setRoomId(roomId);
         setMovieId(movieId);
         setStartsAt(startsAt);
         setEndsAt(endsAt);
-        setBasePrice(basePrice);
         setStatus(status);
     }
 
@@ -52,14 +45,6 @@ public class Showtime {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getCinemaId() {
-        return cinemaId;
-    }
-
-    public void setCinemaId(long cinemaId) {
-        this.cinemaId = cinemaId;
     }
 
     public long getRoomId() {
@@ -94,14 +79,6 @@ public class Showtime {
         this.endsAt = endsAt;
     }
 
-    public double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -124,16 +101,14 @@ public class Showtime {
     public void create(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "INSERT INTO showtime (cinema_id, room_id, movie_id, starts_at, ends_at, base_price, status) "
+            String sql = "INSERT INTO showtime ( room_id, movie_id, starts_at, ends_at, status) "
                     +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?)";
             statement = connection.prepareStatement(sql);
-            statement.setLong(1, this.getCinemaId());
             statement.setLong(2, this.getRoomId());
             statement.setLong(3, this.getMovieId());
             statement.setTimestamp(4, this.getStartsAt());
             statement.setTimestamp(5, this.getEndsAt());
-            statement.setBigDecimal(6, new java.math.BigDecimal(String.valueOf(this.getBasePrice())));
             statement.setString(7, (this.getStatus() == null) ? "SCHEDULED" : this.getStatus());
             statement.executeUpdate();
         } finally {
@@ -162,12 +137,10 @@ public class Showtime {
             statement.setLong(1, this.getId());
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                this.setCinemaId(resultSet.getLong("cinema_id"));
                 this.setRoomId(resultSet.getLong("room_id"));
                 this.setMovieId(resultSet.getLong("movie_id"));
                 this.setStartsAt(resultSet.getTimestamp("starts_at"));
                 this.setEndsAt(resultSet.getTimestamp("ends_at"));
-                this.setBasePrice(resultSet.getBigDecimal("base_price").doubleValue());
                 this.setStatus(resultSet.getString("status"));
             }
         } finally {
@@ -196,12 +169,10 @@ public class Showtime {
                     +
                     "WHERE showtime_id = ?";
             statement = connection.prepareStatement(sql);
-            statement.setLong(1, this.getCinemaId());
             statement.setLong(2, this.getRoomId());
             statement.setLong(3, this.getMovieId());
             statement.setTimestamp(4, this.getStartsAt());
             statement.setTimestamp(5, this.getEndsAt());
-            statement.setBigDecimal(6, new java.math.BigDecimal(String.valueOf(this.getBasePrice())));
             statement.setString(7, this.getStatus());
             statement.setLong(8, this.getId());
             statement.executeUpdate();
@@ -257,12 +228,10 @@ public class Showtime {
             while (resultSet.next()) {
                 list.add(new Showtime(
                         resultSet.getLong("showtime_id"),
-                        resultSet.getLong("cinema_id"),
                         resultSet.getLong("room_id"),
                         resultSet.getLong("movie_id"),
                         resultSet.getTimestamp("starts_at"),
                         resultSet.getTimestamp("ends_at"),
-                        resultSet.getBigDecimal("base_price").doubleValue(),
                         resultSet.getString("status")));
             }
         } finally {

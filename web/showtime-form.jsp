@@ -42,12 +42,6 @@
                                         <input type="hidden" name="action" value="<%= request.getAttribute("action") %>">
                                         <input type="hidden" name="id" value="<%= showtime.getId() %>">
 
-                                        <div class="mb-3">
-                                            <label class="form-label" for="stCinema">Cinéma ID</label>
-                                            <input value="<%= showtime.getCinemaId() %>"
-                                                   name="cinema_id" type="number" class="form-control" id="stCinema"
-                                                   placeholder="Ex: 1" required />
-                                        </div>
 
                                         <div class="mb-3">
                                             <label class="form-label" for="stRoom">Salle ID</label>
@@ -75,13 +69,6 @@
                                             <input value="<%= showtime.getEndsAt() != null ? showtime.getEndsAt() : "" %>"
                                                    name="ends_at" type="text" class="form-control" id="stEnds"
                                                    placeholder="YYYY-MM-DD HH:MM:SS" required />
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label" for="stPrice">Prix de base</label>
-                                            <input value="<%= showtime.getBasePrice() %>"
-                                                   name="base_price" type="number" step="0.01" class="form-control" id="stPrice"
-                                                   placeholder="Ex: 15000" required />
                                         </div>
 
                                         <div class="mb-3">

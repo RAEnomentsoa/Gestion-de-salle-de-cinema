@@ -34,6 +34,7 @@ CREATE TABLE room (
   room_id     BIGSERIAL PRIMARY KEY,
   cinema_id   BIGINT NOT NULL,
   name        VARCHAR(60) NOT NULL,
+  capacity    INT NOT NULL DEFAULT 0 CHECK (capacity >= 0),
   status      VARCHAR(15) NOT NULL DEFAULT 'ACTIVE'
               CHECK (status IN ('ACTIVE', 'MAINTENANCE')),
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -89,9 +90,6 @@ CREATE TABLE movie (
 -- Pour accélérer les recherches
 CREATE INDEX idx_movie_title ON movie(title);
 CREATE INDEX idx_movie_status ON movie(status);
-
-INSERT INTO movie (title, duration_min, age_rating, status)
-VALUES ('Avatar', 120, '-16', 'ACTIVE');
 
 -- =========================
 -- SHOWTIME (Séance)
@@ -165,18 +163,6 @@ CREATE TABLE IF NOT EXISTS ticket (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ticket_showtime ON ticket(showtime_id);
-
-
-
-INSERT INTO ticket (
-    showtime_id,
-    seat_id,
-    prix
-) VALUES (
-    1,
-    1,
-    15000.00
-);
 
 
 -- =========================

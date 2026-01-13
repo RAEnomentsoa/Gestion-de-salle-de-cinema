@@ -23,11 +23,11 @@ VALUES ('Cine Star', 'Avenue de l''Independance', 'Antananarivo', 'ACTIVE');
 -- -------------------------
 -- 2) ROOM
 -- -------------------------
-INSERT INTO room (cinema_id, name, status)
+INSERT INTO room (cinema_id, name, capacity, status)
 VALUES
-(1, 'Salle 1', 'ACTIVE'),
-(1, 'Salle 2', 'ACTIVE'),
-(1, 'Salle 3', 'MAINTENANCE');
+(1, 'Salle 1',20, 'ACTIVE'),
+(1, 'Salle 2',20, 'ACTIVE'),
+(1, 'Salle 3',20, 'MAINTENANCE');
 
 
 INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
@@ -67,7 +67,6 @@ INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
 (3, 'A', 9, 'STANDARD', TRUE),
 (3, 'A', 10, 'STANDARD', TRUE);
 
-,(3,'A',5,'STANDARD',true);
 
 -- -------------------------
 -- 4) MOVIE

@@ -42,15 +42,13 @@ public class ShowtimeServlet extends HttpServlet {
         try {
             String action = request.getParameter("action");
             long id = Long.parseLong(request.getParameter("id"));
-            long cinemaId = Long.parseLong(request.getParameter("cinema_id"));
             long roomId = Long.parseLong(request.getParameter("room_id"));
             long movieId = Long.parseLong(request.getParameter("movie_id"));
             Timestamp startsAt = Timestamp.valueOf(request.getParameter("starts_at"));
             Timestamp endsAt = Timestamp.valueOf(request.getParameter("ends_at"));
-            double basePrice = Double.parseDouble(request.getParameter("base_price"));
             String status = request.getParameter("status");
 
-            Showtime showtime = new Showtime(id, cinemaId, roomId, movieId, startsAt, endsAt, basePrice, status);
+            Showtime showtime = new Showtime(id, roomId, movieId, startsAt, endsAt,status);
 
             if (action != null && action.equals("update")) {
                 showtime.update();

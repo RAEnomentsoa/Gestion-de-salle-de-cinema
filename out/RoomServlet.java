@@ -43,10 +43,10 @@ public class RoomServlet extends HttpServlet {
             long id = Long.parseLong(request.getParameter("id"));
             long cinemaId = Long.parseLong(request.getParameter("cinema_id"));
             String name = request.getParameter("name");
-            String screenType = request.getParameter("screen_type");
+            long capacity = Long.parseLong(request.getParameter("capacity"));
             String status = request.getParameter("status");
 
-            Room room = new Room(id, cinemaId, name, screenType, status);
+            Room room = new Room(id, cinemaId, name, capacity, status);
 
             if (action != null && action.equals("update")) {
                 room.update();

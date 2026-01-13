@@ -57,9 +57,9 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label" for="roomScreenType">Type écran</label>
-                                            <input value="<%= room.getScreenType() != null ? room.getScreenType() : "" %>"
-                                                   name="screen_type" type="text" class="form-control" id="roomScreenType"
+                                            <label class="form-label" for="roomScreenType">Capacite</label>
+                                            <input value="<%= room.getcapacity() != null ? room.getcapacity() : "" %>"
+                                                   name="capacity" type="text" class="form-control" id="roomcapacity"
                                                    placeholder="Ex: STANDARD, IMAX" />
                                         </div>
 

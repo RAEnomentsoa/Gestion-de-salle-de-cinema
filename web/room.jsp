@@ -44,7 +44,7 @@
                                     <th>#</th>
                                     <th>Cinéma ID</th>
                                     <th>Nom</th>
-                                    <th>Type écran</th>
+                                    <th>Capacite</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -56,7 +56,7 @@
                                     <td><strong><%= r.getId() %></strong></td>
                                     <td><%= r.getCinemaId() %></td>
                                     <td><%= r.getName() %></td>
-                                    <td><%= r.getScreenType() %></td>
+                                    <td><%= r.getCapacity() %></td>
                                     <td><%= r.getStatus() %></td>
                                     <td>
                                         <div class="dropdown">

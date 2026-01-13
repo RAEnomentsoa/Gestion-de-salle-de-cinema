@@ -10,7 +10,7 @@ public class Room {
     long id; // room_id
     long cinemaId; // cinema_id
     String name;
-    String screenType; // nullable
+    long capacity;
     String status;
 
     public Room() {
@@ -20,18 +20,18 @@ public class Room {
         setId(id);
     }
 
-    public Room(long id, long cinemaId, String name, String screenType, String status) {
+    public Room(long id, long cinemaId, String name, long capacity, String status) {
         setId(id);
         setCinemaId(cinemaId);
         setName(name);
-        setScreenType(screenType);
+        setCapacity(capacity);
         setStatus(status);
     }
 
-    public Room(long cinemaId, String name, String screenType, String status) {
+    public Room(long cinemaId, String name, long capacity, String status) {
         setCinemaId(cinemaId);
         setName(name);
-        setScreenType(screenType);
+        setCapacity(capacity);
         setStatus(status);
     }
 
@@ -59,12 +59,12 @@ public class Room {
         this.name = name;
     }
 
-    public String getScreenType() {
-        return screenType;
+    public long getCapacity() {
+        return capacity;
     }
 
-    public void setScreenType(String screenType) {
-        this.screenType = screenType;
+    public void setCapacity(long capacity) {
+        this.capacity = capacity;
     }
 
     public String getStatus() {
@@ -93,7 +93,7 @@ public class Room {
             statement = connection.prepareStatement(sql);
             statement.setLong(1, this.getCinemaId());
             statement.setString(2, this.getName());
-            statement.setString(3, this.getScreenType()); // can be null
+            statement.setLong(3, this.getCapacity()); // can be null
             statement.setString(4, (this.getStatus() == null) ? "ACTIVE" : this.getStatus());
             statement.executeUpdate();
         } finally {
@@ -124,7 +124,7 @@ public class Room {
             if (resultSet.next()) {
                 this.setCinemaId(resultSet.getLong("cinema_id"));
                 this.setName(resultSet.getString("name"));
-                this.setScreenType(resultSet.getString("screen_type"));
+                this.setCapacity(resultSet.getLong("capacity"));
                 this.setStatus(resultSet.getString("status"));
             }
         } finally {
@@ -149,11 +149,11 @@ public class Room {
     public void update(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "UPDATE room SET cinema_id = ?, name = ?, screen_type = ?, status = ? WHERE room_id = ?";
+            String sql = "UPDATE room SET cinema_id = ?, name = ?, capacity = ?, status = ? WHERE room_id = ?";
             statement = connection.prepareStatement(sql);
             statement.setLong(1, this.getCinemaId());
             statement.setString(2, this.getName());
-            statement.setString(3, this.getScreenType());
+            statement.setLong(3, this.getCapacity());
             statement.setString(4, this.getStatus());
             statement.setLong(5, this.getId());
             statement.executeUpdate();
@@ -211,7 +211,7 @@ public class Room {
                         resultSet.getLong("room_id"),
                         resultSet.getLong("cinema_id"),
                         resultSet.getString("name"),
-                        resultSet.getString("screen_type"),
+                        resultSet.getLong("capacity"),
                         resultSet.getString("status")));
             }
         } finally {

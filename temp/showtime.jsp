@@ -42,12 +42,10 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Cinéma ID</th>
                                     <th>Salle ID</th>
                                     <th>Film ID</th>
                                     <th>Début</th>
                                     <th>Fin</th>
-                                    <th>Prix</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -57,12 +55,10 @@
                                 <% for (Showtime s : (List<Showtime>) request.getAttribute("showtimes")) { %>
                                 <tr>
                                     <td><strong><%= s.getId() %></strong></td>
-                                    <td><%= s.getCinemaId() %></td>
                                     <td><%= s.getRoomId() %></td>
                                     <td><%= s.getMovieId() %></td>
                                     <td><%= s.getStartsAt() %></td>
                                     <td><%= s.getEndsAt() %></td>
-                                    <td><%= s.getBasePrice() %></td>
                                     <td><%= s.getStatus() %></td>
                                     <td>
                                         <div class="dropdown">
