@@ -205,7 +205,14 @@ CREATE INDEX IF NOT EXISTS idx_reservation_ticket ON reservation(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_reservation_status ON reservation(status);
 
 
-
+CREATE TABLE app_user (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
 
 
 
