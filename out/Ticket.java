@@ -6,41 +6,33 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Reservation {
-    private long reservationId;
+public class Ticket {
     private long ticketId;
-    private long clientId;
-    private String status;
+    private long showtimeId;
+    private Long seatId;
+    private double prix;
     private Timestamp createdAt;
 
     // ---------------------------
     // Constructors
     // ---------------------------
-    public Reservation() {
+    public Ticket() {
     }
 
-    public Reservation(long reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    public Reservation(long reservationId, long ticketId, long clientId, String status) {
-        this.reservationId = reservationId;
+    public Ticket(long ticketId) {
         this.ticketId = ticketId;
-        this.clientId = clientId;
-        this.status = status;
+    }
+
+    public Ticket(long ticketId, long showtimeId, Long seatId, double prix) {
+        this.ticketId = ticketId;
+        this.showtimeId = showtimeId;
+        this.seatId = seatId;
+        this.prix = prix;
     }
 
     // ---------------------------
     // Getters & Setters
     // ---------------------------
-    public long getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(long reservationId) {
-        this.reservationId = reservationId;
-    }
-
     public long getTicketId() {
         return ticketId;
     }
@@ -49,20 +41,28 @@ public class Reservation {
         this.ticketId = ticketId;
     }
 
-    public long getClientId() {
-        return clientId;
+    public long getShowtimeId() {
+        return showtimeId;
     }
 
-    public void setClientId(long clientId) {
-        this.clientId = clientId;
+    public void setShowtimeId(long showtimeId) {
+        this.showtimeId = showtimeId;
     }
 
-    public String getStatus() {
-        return status;
+    public Long getSeatId() {
+        return seatId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setSeatId(Long seatId) {
+        this.seatId = seatId;
+    }
+
+    public double getPrix() {
+        return prix;
+    }
+
+    public void setPrix(double prix) {
+        this.prix = prix;
     }
 
     public Timestamp getCreatedAt() {
@@ -83,11 +83,15 @@ public class Reservation {
     }
 
     public void create(Connection connection) throws SQLException {
-        String sql = "INSERT INTO reservation (ticket_id, client_id, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO ticket (showtime_id, seat_id, prix) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getTicketId());
-            statement.setLong(2, this.getClientId());
-            statement.setString(3, (this.getStatus() == null) ? "NON_PAYER" : this.getStatus());
+            statement.setLong(1, this.getShowtimeId());
+            if (this.getSeatId() != null) {
+                statement.setLong(2, this.getSeatId());
+            } else {
+                statement.setNull(2, Types.BIGINT);
+            }
+            statement.setDouble(3, this.getPrix());
             statement.executeUpdate();
         }
     }
@@ -102,14 +106,15 @@ public class Reservation {
     }
 
     public void getById(Connection connection) throws SQLException {
-        String sql = "SELECT * FROM reservation WHERE reservation_id = ?";
+        String sql = "SELECT * FROM ticket WHERE ticket_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getReservationId());
+            statement.setLong(1, this.getTicketId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    this.setTicketId(resultSet.getLong("ticket_id"));
-                    this.setClientId(resultSet.getLong("client_id"));
-                    this.setStatus(resultSet.getString("status"));
+                    this.setShowtimeId(resultSet.getLong("showtime_id"));
+                    long seat = resultSet.getLong("seat_id");
+                    this.setSeatId(resultSet.wasNull() ? null : seat);
+                    this.setPrix(resultSet.getDouble("prix"));
                     this.setCreatedAt(resultSet.getTimestamp("created_at"));
                 }
             }
@@ -126,12 +131,16 @@ public class Reservation {
     }
 
     public void update(Connection connection) throws SQLException {
-        String sql = "UPDATE reservation SET ticket_id = ?, client_id = ?, status = ? WHERE reservation_id = ?";
+        String sql = "UPDATE ticket SET showtime_id = ?, seat_id = ?, prix = ? WHERE ticket_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getTicketId());
-            statement.setLong(2, this.getClientId());
-            statement.setString(3, this.getStatus());
-            statement.setLong(4, this.getReservationId());
+            statement.setLong(1, this.getShowtimeId());
+            if (this.getSeatId() != null) {
+                statement.setLong(2, this.getSeatId());
+            } else {
+                statement.setNull(2, Types.BIGINT);
+            }
+            statement.setDouble(3, this.getPrix());
+            statement.setLong(4, this.getTicketId());
             statement.executeUpdate();
         }
     }
@@ -146,9 +155,9 @@ public class Reservation {
     }
 
     public void delete(Connection connection) throws SQLException {
-        String sql = "DELETE FROM reservation WHERE reservation_id = ?";
+        String sql = "DELETE FROM ticket WHERE ticket_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getReservationId());
+            statement.setLong(1, this.getTicketId());
             statement.executeUpdate();
         }
     }
@@ -156,25 +165,25 @@ public class Reservation {
     // ---------------------------
     // GET ALL
     // ---------------------------
-    public static List<Reservation> getAll() throws Exception {
+    public static List<Ticket> getAll() throws Exception {
         try (Connection connection = DBConnection.getConnection()) {
             return getAll(connection);
         }
     }
 
-    public static List<Reservation> getAll(Connection connection) throws SQLException {
-        List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservation ORDER BY reservation_id";
+    public static List<Ticket> getAll(Connection connection) throws SQLException {
+        List<Ticket> list = new ArrayList<>();
+        String sql = "SELECT * FROM ticket ORDER BY ticket_id";
         try (PreparedStatement statement = connection.prepareStatement(sql);
                 ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                Reservation r = new Reservation(
-                        resultSet.getLong("reservation_id"),
+                Ticket t = new Ticket(
                         resultSet.getLong("ticket_id"),
-                        resultSet.getLong("client_id"),
-                        resultSet.getString("status"));
-                r.setCreatedAt(resultSet.getTimestamp("created_at"));
-                list.add(r);
+                        resultSet.getLong("showtime_id"),
+                        resultSet.getObject("seat_id") == null ? null : resultSet.getLong("seat_id"),
+                        resultSet.getDouble("prix"));
+                t.setCreatedAt(resultSet.getTimestamp("created_at"));
+                list.add(t);
             }
         }
         return list;

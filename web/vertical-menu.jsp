@@ -60,6 +60,25 @@
             </a>
         </li>
 
+               <!-- ticket -->
+        <li class="menu-item <%= "ticket".equals(activeMenuItem) ? "active" : "" %>">
+            <a href="ticket" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-category"></i>
+                <div data-i18n="ticket">ticket</div>
+            </a>
+        </li>
+
+           <!-- reservation -->
+        <li class="menu-item <%= "reservation".equals(activeMenuItem) ? "active" : "" %>">
+            <a href="reservation" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-category"></i>
+                <div data-i18n="reservation">reservation</div>
+            </a>
+        </li>
+
+        
+    
+
         
         <!-- Vente avec sous-menu -->
         <li class="menu-item <%= "vente".equals(activeMenuItem) || "venteDetails".equals(activeMenuItem) ? "active" : "" %>">
