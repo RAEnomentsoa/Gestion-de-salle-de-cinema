@@ -8,7 +8,7 @@
     <div class="app-brand demo">
         <a href="produit" class="app-brand-link">
             <span class="app-brand-logo demo">
-                <img width="25" src="assets/img/favicon/book.png" alt="Boulangerie logo">
+                <img width="60" src="assets/img/favicon/cinemalogo.png" alt="Boulangerie logo">
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">cinema</span>
         </a>
@@ -20,81 +20,78 @@
     <!-- / App brand -->
 
     <ul class="menu-inner py-1">
-        <!-- cinema -->
-        <li class="menu-item <%= "cinema".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="cinema" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-cube"></i>
-                <div data-i18n="cinema">cinema</div>
-            </a>
-        </li>
+            <!-- cinema -->
+            <li class="menu-item <%= "cinema".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="cinema" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-movie-play"></i>
+                    <div data-i18n="cinema">Cinema</div>
+                </a>
+            </li>
 
-        <!-- room -->
-        <li class="menu-item <%= "room".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="room" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-food-menu"></i>
-                <div data-i18n="room">room</div>
-            </a>
-        </li>
+            <!-- room -->
+            <li class="menu-item <%= "room".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="room" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-buildings"></i>
+                    <div data-i18n="room">Room</div>
+                </a>
+            </li>
 
-        <!-- seat -->
-        <li class="menu-item <%= "seat".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="seat" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="seat">seat</div>
-            </a>
-        </li>
+            <!-- seat -->
+            <li class="menu-item <%= "seat".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="seat" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-chair"></i>
+                    <div data-i18n="seat">Seat</div>
+                </a>
+            </li>
 
-        <!-- movie -->
-        <li class="menu-item <%= "movie".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="movie" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="movie">movie</div>
-            </a>
-        </li>
+            <!-- movie -->
+            <li class="menu-item <%= "movie".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="movie" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-film"></i>
+                    <div data-i18n="movie">Movie</div>
+                </a>
+            </li>
 
-        <!-- showtime -->
-        <li class="menu-item <%= "showtime".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="showtime" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="showtime">showtime</div>
-            </a>
-        </li>
+            <!-- showtime -->
+            <li class="menu-item <%= "showtime".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="showtime" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-time"></i>
+                    <div data-i18n="showtime">Showtime</div>
+                </a>
+            </li>
 
-               <!-- ticket -->
-        <li class="menu-item <%= "ticket".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="ticket" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="ticket">ticket</div>
-            </a>
-        </li>
+            <!-- ticket -->
+            <li class="menu-item <%= "ticket".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="ticket" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-receipt"></i>
+                    <div data-i18n="ticket">Ticket</div>
+                </a>
+            </li>
 
-           <!-- reservation -->
-        <li class="menu-item <%= "reservation".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="reservation" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="reservation">reservation</div>
-            </a>
-        </li>
+            <!-- reservation -->
+            <li class="menu-item <%= "reservation".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="reservation" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-bookmark"></i>
+                    <div data-i18n="reservation">Reservation</div>
+                </a>
+            </li>
 
-        
-    
+            <!-- Report / Vente -->
+            <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="javascript:void(0);" class="menu-link dropdown-toggle">
+                    <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
+                    <div data-i18n="Report">Report</div>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
+                        <a href="reservationReport" class="menu-link">
+                            <i class="bx bx-file me-2"></i>
+                            Rapport Réservations
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-        
-        <!-- Vente avec sous-menu -->
-        <li class="menu-item <%= "vente".equals(activeMenuItem) || "venteDetails".equals(activeMenuItem) ? "active" : "" %>">
-            <a href="javascript:void(0);" class="menu-link dropdown-toggle">
-                <i class="menu-icon tf-icons bx bx-cart"></i>
-                <div data-i18n="Vente">Vente</div>
-            </a>
-            <ul class="dropdown-menu">
-                <li class="menu-item <%= "vente".equals(activeMenuItem) ? "active" : "" %>">
-                    <a href="vente" class="menu-link">Vente</a>
-                </li>
-                <li class="menu-item <%= "venteDetails".equals(activeMenuItem) ? "active" : "" %>">
-                    <a href="factureDetails" class="menu-link">Détails Vente</a>
-                </li>
-            </ul>
-        </li>
         <!-- Stocks avec sous-menu -->
         <li class="menu-item <%= "stock".equals(activeMenuItem) || "ingredientStock".equals(activeMenuItem) || "produitStock".equals(activeMenuItem) ? "active" : "" %>">
             <a href="javascript:void(0);" class="menu-link dropdown-toggle">

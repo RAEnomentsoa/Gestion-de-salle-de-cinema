@@ -188,4 +188,35 @@ public class Ticket {
         }
         return list;
     }
+
+    public static List<Ticket> getByRoomId(long roomId) throws Exception {
+        String sql = """
+                    SELECT t.*
+                    FROM ticket t
+                    JOIN showtime s ON t.showtime_id = s.showtime_id
+                    WHERE s.room_id = ?
+                    ORDER BY t.ticket_id
+                """;
+
+        List<Ticket> list = new ArrayList<>();
+
+        try (Connection c = DBConnection.getConnection();
+                PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setLong(1, roomId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ticket t = new Ticket(
+                            rs.getLong("ticket_id"),
+                            rs.getLong("showtime_id"),
+                            rs.getObject("seat_id") == null ? null : rs.getLong("seat_id"),
+                            rs.getDouble("prix"));
+                    t.setCreatedAt(rs.getTimestamp("created_at"));
+                    list.add(t);
+                }
+            }
+        }
+        return list;
+    }
+
 }
