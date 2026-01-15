@@ -68,6 +68,14 @@
                 </a>
             </li>
 
+             <!-- client -->
+            <li class="menu-item <%= "client".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="client" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-bookmark"></i>
+                    <div data-i18n="client">client</div>
+                </a>
+            </li>
+
             <!-- reservation -->
             <li class="menu-item <%= "reservation".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="reservation" class="menu-link">
