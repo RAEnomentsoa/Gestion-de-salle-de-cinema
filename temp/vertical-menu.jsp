@@ -76,6 +76,37 @@
                 </a>
             </li>
 
+             <!-- reservation -->
+            <li class="menu-item <%= "roomRevenue".equals(activeMenuItem) ? "active" : "" %>">
+                 <a href="javascript:void(0);" class="menu-link dropdown-toggle">
+                <i class="menu-icon tf-icons bx bx-box"></i>
+                <div data-i18n="Stock">salle</div>
+            </a>
+                 <ul class="dropdown-menu">
+                    <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
+                        <a href="roomRevenue?room_id=1" class="menu-link">
+                            <i class="bx bx-file me-2"></i>
+                            salle 1
+                        </a>
+                    </li>
+                    <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
+                        <a href="roomRevenue?room_id=2" class="menu-link">
+                            <i class="bx bx-file me-2"></i>
+                            salle 2
+                        </a>
+                    </li>
+                    <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
+                        <a href="roomRevenue?room_id=3" class="menu-link">
+                            <i class="bx bx-file me-2"></i>
+                            salle 3
+                        </a>
+                    </li>
+                </ul>
+                
+                
+            </li>
+        
+
             <!-- Report / Vente -->
             <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="javascript:void(0);" class="menu-link dropdown-toggle">

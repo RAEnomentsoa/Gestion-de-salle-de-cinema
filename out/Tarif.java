@@ -6,35 +6,35 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Room {
-    long id; // room_id
-    long cinemaId; // cinema_id
-    String name;
-    long capacity;
-    String status;
+public class Tarif {
+    private long id;       // correspond à "id" dans la table tarif
+    private String nom;
+    private double prix;
 
-    public Room() {
+    // ---------------------------
+    // Constructeurs
+    // ---------------------------
+    public Tarif() {
     }
 
-    public Room(long id) {
+    public Tarif(long id) {
         setId(id);
     }
 
-    public Room(long id, long cinemaId, String name, long capacity, String status) {
+    public Tarif(long id, String nom, double prix) {
         setId(id);
-        setCinemaId(cinemaId);
-        setName(name);
-        setCapacity(capacity);
-        setStatus(status);
+        setNom(nom);
+        setPrix(prix);
     }
 
-    public Room(long cinemaId, String name, long capacity, String status) {
-        setCinemaId(cinemaId);
-        setName(name);
-        setCapacity(capacity);
-        setStatus(status);
+    public Tarif(String nom, double prix) {
+        setNom(nom);
+        setPrix(prix);
     }
 
+    // ---------------------------
+    // Getters et Setters
+    // ---------------------------
     public long getId() {
         return id;
     }
@@ -43,38 +43,25 @@ public class Room {
         this.id = id;
     }
 
-    public long getCinemaId() {
-        return cinemaId;
+    public String getNom() {
+        return nom;
     }
 
-    public void setCinemaId(long cinemaId) {
-        this.cinemaId = cinemaId;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
-    public String getName() {
-        return name;
+    public double getPrix() {
+        return prix;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPrix(double prix) {
+        this.prix = prix;
     }
 
-    public long getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(long capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
+    // ---------------------------
+    // CREATE
+    // ---------------------------
     public void create() throws Exception {
         Connection connection = null;
         try {
@@ -89,19 +76,28 @@ public class Room {
     public void create(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "INSERT INTO room (cinema_id, name, capacity, status) VALUES (?, ?, ?, ?)";
-            statement = connection.prepareStatement(sql);
-            statement.setLong(1, this.getCinemaId());
-            statement.setString(2, this.getName());
-            statement.setLong(3, this.getCapacity()); // can be null
-            statement.setString(4, (this.getStatus() == null) ? "ACTIVE" : this.getStatus());
+            String sql = "INSERT INTO tarif (nom, prix) VALUES (?, ?)";
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, this.getNom());
+            statement.setDouble(2, this.getPrix());
             statement.executeUpdate();
+
+            // récupérer l'id généré automatiquement
+            ResultSet rs = statement.getGeneratedKeys();
+            if (rs.next()) {
+                this.setId(rs.getLong(1));
+            }
+            if (rs != null)
+                rs.close();
         } finally {
             if (statement != null)
                 statement.close();
         }
     }
 
+    // ---------------------------
+    // READ by ID
+    // ---------------------------
     public void getById() throws Exception {
         Connection connection = null;
         try {
@@ -117,15 +113,14 @@ public class Room {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
-            String sql = "SELECT * FROM room WHERE room_id = ?";
+            String sql = "SELECT * FROM tarif WHERE id = ?";
             statement = connection.prepareStatement(sql);
             statement.setLong(1, this.getId());
             resultSet = statement.executeQuery();
+
             if (resultSet.next()) {
-                this.setCinemaId(resultSet.getLong("cinema_id"));
-                this.setName(resultSet.getString("name"));
-                this.setCapacity(resultSet.getLong("capacity"));
-                this.setStatus(resultSet.getString("status"));
+                this.setNom(resultSet.getString("nom"));
+                this.setPrix(resultSet.getDouble("prix"));
             }
         } finally {
             if (resultSet != null)
@@ -135,6 +130,9 @@ public class Room {
         }
     }
 
+    // ---------------------------
+    // UPDATE
+    // ---------------------------
     public void update() throws Exception {
         Connection connection = null;
         try {
@@ -149,13 +147,11 @@ public class Room {
     public void update(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "UPDATE room SET cinema_id = ?, name = ?, capacity = ?, status = ? WHERE room_id = ?";
+            String sql = "UPDATE tarif SET nom = ?, prix = ? WHERE id = ?";
             statement = connection.prepareStatement(sql);
-            statement.setLong(1, this.getCinemaId());
-            statement.setString(2, this.getName());
-            statement.setLong(3, this.getCapacity());
-            statement.setString(4, this.getStatus());
-            statement.setLong(5, this.getId());
+            statement.setString(1, this.getNom());
+            statement.setDouble(2, this.getPrix());
+            statement.setLong(3, this.getId());
             statement.executeUpdate();
         } finally {
             if (statement != null)
@@ -163,6 +159,9 @@ public class Room {
         }
     }
 
+    // ---------------------------
+    // DELETE
+    // ---------------------------
     public void delete() throws Exception {
         Connection connection = null;
         try {
@@ -177,7 +176,7 @@ public class Room {
     public void delete(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "DELETE FROM room WHERE room_id = ?";
+            String sql = "DELETE FROM tarif WHERE id = ?";
             statement = connection.prepareStatement(sql);
             statement.setLong(1, this.getId());
             statement.executeUpdate();
@@ -187,7 +186,10 @@ public class Room {
         }
     }
 
-    public static List<Room> getAll() throws Exception {
+    // ---------------------------
+    // GET ALL
+    // ---------------------------
+    public static List<Tarif> getAll() throws Exception {
         Connection connection = null;
         try {
             connection = DBConnection.getConnection();
@@ -198,21 +200,21 @@ public class Room {
         }
     }
 
-    public static List<Room> getAll(Connection connection) throws SQLException {
+    public static List<Tarif> getAll(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        List<Room> list = new ArrayList<>();
+        List<Tarif> list = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM room ORDER BY room_id";
+            String sql = "SELECT * FROM tarif ORDER BY id";
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
-                list.add(new Room(
-                        resultSet.getLong("room_id"),
-                        resultSet.getLong("cinema_id"),
-                        resultSet.getString("name"),
-                        resultSet.getLong("capacity"),
-                        resultSet.getString("status")));
+                list.add(new Tarif(
+                        resultSet.getLong("id"),
+                        resultSet.getString("nom"),
+                        resultSet.getDouble("prix")
+                ));
             }
         } finally {
             if (resultSet != null)

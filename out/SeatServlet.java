@@ -44,7 +44,7 @@ public class SeatServlet extends HttpServlet {
             long roomId = Long.parseLong(request.getParameter("room_id"));
             String rowLabel = request.getParameter("row_label");
             int seatNumber = Integer.parseInt(request.getParameter("seat_number"));
-            String seatType = request.getParameter("seat_type");
+            int seatType = Integer.parseInt(request.getParameter("seat_type"));
             boolean isActive = request.getParameter("is_active") != null;
 
             Seat seat = new Seat(id, roomId, rowLabel, seatNumber, seatType, isActive);

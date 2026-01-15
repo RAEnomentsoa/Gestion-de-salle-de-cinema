@@ -9,7 +9,7 @@ public class DBConnection {
     // Database connection parameters
     private static final String URL = "jdbc:postgresql://localhost:5432/cinema_management";
     private static final String USER = "postgres";
-    private static final String PASSWORD = "Andry2004#";
+    private static final String PASSWORD = "postgres";
 
     // load PostgreSQL driver
     static {

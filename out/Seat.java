@@ -11,7 +11,7 @@ public class Seat {
     long roomId; // room_id
     String rowLabel;
     int seatNumber;
-    String seatType; // STANDARD/VIP/PMR/LOVESEAT
+    int seatType; // STANDARD/VIP/PMR/LOVESEAT
     boolean isActive;
 
     public Seat() {
@@ -21,7 +21,7 @@ public class Seat {
         setId(id);
     }
 
-    public Seat(long id, long roomId, String rowLabel, int seatNumber, String seatType, boolean isActive) {
+    public Seat(long id, long roomId, String rowLabel, int seatNumber, int seatType, boolean isActive) {
         setId(id);
         setRoomId(roomId);
         setRowLabel(rowLabel);
@@ -30,7 +30,7 @@ public class Seat {
         setActive(isActive);
     }
 
-    public Seat(long roomId, String rowLabel, int seatNumber, String seatType, boolean isActive) {
+    public Seat(long roomId, String rowLabel, int seatNumber, int seatType, boolean isActive) {
         setRoomId(roomId);
         setRowLabel(rowLabel);
         setSeatNumber(seatNumber);
@@ -70,11 +70,11 @@ public class Seat {
         this.seatNumber = seatNumber;
     }
 
-    public String getSeatType() {
+    public int getSeatType() {
         return seatType;
     }
 
-    public void setSeatType(String seatType) {
+    public void setSeatType(int seatType) {
         this.seatType = seatType;
     }
 
@@ -105,7 +105,8 @@ public class Seat {
             statement.setLong(1, this.getRoomId());
             statement.setString(2, this.getRowLabel());
             statement.setInt(3, this.getSeatNumber());
-            statement.setString(4, (this.getSeatType() == null) ? "STANDARD" : this.getSeatType());
+           // statement.setInt(4, (this.getSeatType()) ? 1 : this.getSeatType());
+           statement.setInt(4, this.getSeatType());
             statement.setBoolean(5, this.isActive());
             statement.executeUpdate();
         } finally {
@@ -137,7 +138,7 @@ public class Seat {
                 this.setRoomId(resultSet.getLong("room_id"));
                 this.setRowLabel(resultSet.getString("row_label"));
                 this.setSeatNumber(resultSet.getInt("seat_number"));
-                this.setSeatType(resultSet.getString("seat_type"));
+                this.setSeatType(resultSet.getInt("seat_type"));
                 this.setActive(resultSet.getBoolean("is_active"));
             }
         } finally {
@@ -167,7 +168,7 @@ public class Seat {
             statement.setLong(1, this.getRoomId());
             statement.setString(2, this.getRowLabel());
             statement.setInt(3, this.getSeatNumber());
-            statement.setString(4, this.getSeatType());
+            statement.setInt(4, this.getSeatType());
             statement.setBoolean(5, this.isActive());
             statement.setLong(6, this.getId());
             statement.executeUpdate();
@@ -226,7 +227,7 @@ public class Seat {
                         resultSet.getLong("room_id"),
                         resultSet.getString("row_label"),
                         resultSet.getInt("seat_number"),
-                        resultSet.getString("seat_type"),
+                        resultSet.getInt("seat_type"),
                         resultSet.getBoolean("is_active")));
             }
         } finally {
@@ -237,4 +238,50 @@ public class Seat {
         }
         return list;
     }
+
+     public static double getSumPrixSeatByRoomId(long roomId) throws SQLException {
+        String sql = "SELECT COALESCE(SUM(t.prix), 0) AS total " +
+                     "FROM seat s " +
+                     "JOIN tarif t ON s.seat_type = t.id " +
+                     "WHERE s.room_id = ? AND s.is_active = TRUE";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, roomId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total");
+                }
+            }
+        }
+        return 0.0;
+    }
+
+
+    public static List<Seat> getSeatsByRoomId(long roomId) throws SQLException {
+    String sql = "SELECT s.seat_id, s.row_label, s.seat_number, s.seat_type, s.is_active, t.nom AS seat_type_name " +
+                 "FROM seat s " +
+                 "JOIN tarif t ON s.seat_type = t.id " +
+                 "WHERE s.room_id = ? AND s.is_active = TRUE " +
+                 "ORDER BY s.row_label, s.seat_number";
+
+    List<Seat> list = new ArrayList<>();
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setLong(1, roomId);
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Seat s = new Seat();
+                s.setId(rs.getLong("seat_id"));
+                s.setRowLabel(rs.getString("row_label"));
+                s.setSeatNumber(rs.getInt("seat_number"));
+                s.setSeatType(rs.getInt("seat_type"));
+                s.setActive(rs.getBoolean("is_active"));
+                list.add(s);
+            }
+        }
+    }
+    return list;
+}
 }

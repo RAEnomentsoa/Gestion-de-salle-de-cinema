@@ -51,15 +51,15 @@
 
                                         <div class="mb-3">
                                             <label class="form-label" for="roomName">Nom</label>
-                                            <input value="<%= room.getName() != null ? room.getName() : "" %>"
-                                                   name="name" type="text" class="form-control" id="roomName"
+                                            <input
+                                                  name="name" type="text" class="form-control" id="roomName"
                                                    placeholder="Ex: Salle 1" required />
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label" for="roomScreenType">Capacite</label>
-                                            <input value="<%= room.getcapacity() != null ? room.getcapacity() : "" %>"
-                                                   name="capacity" type="text" class="form-control" id="roomcapacity"
+                                            <input
+                                                   name="capacity" type="number" class="form-control" id="roomcapacity"
                                                    placeholder="Ex: STANDARD, IMAX" />
                                         </div>
 

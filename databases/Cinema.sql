@@ -49,22 +49,36 @@ CREATE TABLE room (
 CREATE INDEX idx_room_cinema_id ON room(cinema_id);
 
 -- =========================
+-- tarif
+-- =========================
+CREATE TABLE tarif (
+  id BIGSERIAL PRIMARY KEY,
+  nom      VARCHAR(50) NOT NULL,
+  prix     NUMERIC(10,2) NOT NULL CHECK (prix >= 0)
+);
+
+
+-- =========================
 -- 3) SEAT (Siège)
 -- =========================
+
+
 CREATE TABLE seat (
   seat_id     BIGSERIAL PRIMARY KEY,
   room_id     BIGINT NOT NULL,
   row_label   VARCHAR(10) NOT NULL,
   seat_number INT NOT NULL CHECK (seat_number > 0),
-  seat_type   VARCHAR(15) NOT NULL DEFAULT 'STANDARD'
-              CHECK (seat_type IN ('STANDARD', 'VIP', 'PMR', 'LOVESEAT')),
+  seat_type   BIGINT NOT NULL,
   is_active   BOOLEAN NOT NULL DEFAULT TRUE,
 
   CONSTRAINT fk_seat_room
     FOREIGN KEY (room_id) REFERENCES room(room_id),
 
   CONSTRAINT uq_seat_room_row_number
-    UNIQUE (room_id, row_label, seat_number)
+    UNIQUE (room_id, row_label, seat_number),
+
+   CONSTRAINT fk_seat_tarif
+    FOREIGN KEY (seat_type) REFERENCES tarif(id)
 );
 
 

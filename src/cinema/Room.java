@@ -89,7 +89,7 @@ public class Room {
     public void create(Connection connection) throws SQLException {
         PreparedStatement statement = null;
         try {
-            String sql = "INSERT INTO room (cinema_id, name, screen_type, status) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO room (cinema_id, name, capacity, status) VALUES (?, ?, ?, ?)";
             statement = connection.prepareStatement(sql);
             statement.setLong(1, this.getCinemaId());
             statement.setString(2, this.getName());

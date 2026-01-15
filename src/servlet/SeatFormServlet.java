@@ -3,6 +3,7 @@ package servlet;
 import java.io.IOException;
 
 import cinema.Seat;
+import cinema.Tarif;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,6 +18,9 @@ public class SeatFormServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
         Seat seat = new Seat();
+
+        //  List<Tarif> rows = Tarif.getAll();
+        //     req.setAttribute("Tarif", rows);
 
         if (action != null && action.equals("update")) {
             long id = Long.parseLong(req.getParameter("id"));

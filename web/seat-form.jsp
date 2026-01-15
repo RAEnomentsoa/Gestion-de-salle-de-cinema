@@ -66,12 +66,11 @@
                                         <div class="mb-3">
                                             <label class="form-label" for="seatType">Type</label>
                                             <select name="seat_type" class="form-control" id="seatType" required>
-                                                <option value="STANDARD" <%= "STANDARD".equals(seat.getSeatType()) || seat.getSeatType() == null ? "selected" : "" %>>STANDARD</option>
-                                                <option value="VIP" <%= "VIP".equals(seat.getSeatType()) ? "selected" : "" %>>VIP</option>
-                                                <option value="PMR" <%= "PMR".equals(seat.getSeatType()) ? "selected" : "" %>>PMR</option>
-                                                <option value="LOVESEAT" <%= "LOVESEAT".equals(seat.getSeatType()) ? "selected" : "" %>>LOVESEAT</option>
+                                                <option value="1" <%= seat.getSeatType() == 1 ? "selected" : "" %>>STANDARD</option>
+                                                <option value="2" <%= seat.getSeatType() == 2 ? "selected" : "" %>>PREMIUM</option>
                                             </select>
                                         </div>
+
 
                                         <div class="mb-3">
                                             <label class="form-label">Actif</label>
