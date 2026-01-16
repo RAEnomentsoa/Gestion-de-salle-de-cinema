@@ -2,9 +2,9 @@
 -- BASE "Gestion de salle cinéma" (PostgreSQL)
 -- Core tables: cinema, room, seat, movie
 -- ============================================================
-CREATE DATABASE cinema_management;
+CREATE DATABASE cinema_managements;
 
-\c cinema_management
+\c cinema_managements
 
 
 -- =========================

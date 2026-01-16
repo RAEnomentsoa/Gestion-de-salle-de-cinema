@@ -34,9 +34,9 @@ VALUES
 (1, 'Salle 3',20, 'MAINTENANCE');
 
 
-INSERT INTO tarif (nom, prix) VALUES
-('STANDARD', 20000.00),
-('PREMIUM', 50000.00);
+INSERT INTO tarif (nom, prix) VALUES('VIP', 90000.00);
+('PREMIUM', 50000.00),
+ ('VIP', 90000.00);
 
 
 INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES

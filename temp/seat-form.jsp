@@ -68,6 +68,7 @@
                                             <select name="seat_type" class="form-control" id="seatType" required>
                                                 <option value="1" <%= seat.getSeatType() == 1 ? "selected" : "" %>>STANDARD</option>
                                                 <option value="2" <%= seat.getSeatType() == 2 ? "selected" : "" %>>PREMIUM</option>
+                                                <option value="3" <%= seat.getSeatType() == 3 ? "selected" : "" %>>VIP</option>
                                             </select>
                                         </div>
 
