@@ -36,7 +36,8 @@ VALUES
 
 INSERT INTO tarif (nom, prix) VALUES
 ('STANDARD', 20000.00),
-('PREMIUM', 50000.00);
+('PREMIUM', 50000.00),
+('VIP', 90000.00);
 
 
 INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
@@ -113,7 +114,7 @@ INSERT INTO client (nom, address, age) VALUES
 ('Client 4',  'Adresse 4',  28),
 ('Client 5',  'Adresse 5',  35),
 ('Client 6',  'Adresse 6',  40),
-('Client 7',  'Adresse 7',  18),
+('Client 7',  'Adresse 7',  16),
 ('Client 8',  'Adresse 8',  27),
 ('Client 9',  'Adresse 9',  33),
 ('Client 10', 'Adresse 10', 45);
