@@ -1,6 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="cinema.Client" %>
+<%@ page import="cinema.Categorie" %>
+<%@ page import="java.util.List" %>
 <% Client client = (Client) request.getAttribute("client"); %>
+<% List<Categorie> listeCategorie = (List<Categorie>) request.getAttribute("listeCategorie"); %>
 
 <%@include file="header.jsp"%>
 
@@ -62,6 +65,22 @@
                                                   name="age" type="number" class="form-control" id="clientAge"
                                                   placeholder="Ex: 25"/>
                                         </div>
+
+                                        <<div class="mb-3">
+                                            <label class="form-label" for="clientCategorie">Catégorie</label>
+                                            <select name="id_categorie" class="form-control" id="clientCategorie" required>
+                                                <option value="">-- Catégorie --</option>
+                                                <% if (listeCategorie != null) {
+                                                    for (Categorie c : listeCategorie) { %>
+                                                        <option value="<%= c.getId() %>">
+                                                            <%= c.getNom() %>
+                                                        </option>
+                                                <%  }
+                                                } %>
+                                            </select>
+                                        </div>
+
+
 
                                         <% if (request.getAttribute("action").equals("create")) { %>
                                         <button type="submit" class="btn btn-success">Ajouter</button>

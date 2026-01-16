@@ -6,46 +6,40 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client {
+public class Categorie {
 
-    long id; // client_id
+    int id;
     String nom;
-    String address;
-    int age;
-    int id_categorie;
+    Integer prix; // Peut être null
 
     // ---------------------------
     // CONSTRUCTEURS
     // ---------------------------
-    public Client() { }
+    public Categorie() { }
 
-    public Client(long id) {
+    public Categorie(int id) {
         setId(id);
     }
 
-    public Client(long id, String nom, String address, int age, int id_categorie) {
+    public Categorie(int id, String nom, Integer prix) {
         setId(id);
         setNom(nom);
-        setAddress(address);
-        setAge(age);
-        setId_categorie(id_categorie);
+        setPrix(prix);
     }
 
-    public Client(String nom, String address, int age, int id_categorie) {
+    public Categorie(String nom, Integer prix) {
         setNom(nom);
-        setAddress(address);
-        setAge(age);
-        setId_categorie(id_categorie);
+        setPrix(prix);
     }
 
     // ---------------------------
     // GETTERS / SETTERS
     // ---------------------------
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -57,28 +51,12 @@ public class Client {
         this.nom = nom;
     }
 
-    public String getAddress() {
-        return address;
+    public Integer getPrix() {
+        return prix;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public int getId_categorie() {
-        return id_categorie;
-    }
-
-    public void setId_categorie(int id_categorie) {
-        this.id_categorie = id_categorie;
+    public void setPrix(Integer prix) {
+        this.prix = prix;
     }
 
     // ---------------------------
@@ -91,16 +69,15 @@ public class Client {
     }
 
     public void create(Connection connection) throws SQLException {
-        String sql = """
-            INSERT INTO client (id_categorie, nom, address, age)
-            VALUES (?, ?, ?, ?)
-        """;
+        String sql = "INSERT INTO categorie (nom, prix) VALUES (?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, this.getId_categorie());
-            statement.setString(2, this.getNom());
-            statement.setString(3, this.getAddress());
-            statement.setInt(4, this.getAge());
+            statement.setString(1, this.getNom());
+            if (this.getPrix() != null) {
+                statement.setInt(2, this.getPrix());
+            } else {
+                statement.setNull(2, Types.INTEGER);
+            }
             statement.executeUpdate();
         }
     }
@@ -115,17 +92,20 @@ public class Client {
     }
 
     public void getById(Connection connection) throws SQLException {
-        String sql = "SELECT * FROM client WHERE client_id = ?";
+        String sql = "SELECT * FROM categorie WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getId());
+            statement.setInt(1, this.getId());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     this.setNom(resultSet.getString("nom"));
-                    this.setAddress(resultSet.getString("address"));
-                    this.setAge(resultSet.getInt("age"));
-                    this.setId_categorie(resultSet.getInt("id_categorie"));
+                    int p = resultSet.getInt("prix");
+                    if (resultSet.wasNull()) {
+                        this.setPrix(null);
+                    } else {
+                        this.setPrix(p);
+                    }
                 }
             }
         }
@@ -141,18 +121,16 @@ public class Client {
     }
 
     public void update(Connection connection) throws SQLException {
-        String sql = """
-            UPDATE client
-            SET nom = ?, address = ?, age = ?, id_categorie = ?
-            WHERE client_id = ?
-        """;
+        String sql = "UPDATE categorie SET nom = ?, prix = ? WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, this.getNom());
-            statement.setString(2, this.getAddress());
-            statement.setInt(3, this.getAge());
-            statement.setInt(4, this.getId_categorie());
-            statement.setLong(5, this.getId());
+            if (this.getPrix() != null) {
+                statement.setInt(2, this.getPrix());
+            } else {
+                statement.setNull(2, Types.INTEGER);
+            }
+            statement.setInt(3, this.getId());
             statement.executeUpdate();
         }
     }
@@ -167,10 +145,10 @@ public class Client {
     }
 
     public void delete(Connection connection) throws SQLException {
-        String sql = "DELETE FROM client WHERE client_id = ?";
+        String sql = "DELETE FROM categorie WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, this.getId());
+            statement.setInt(1, this.getId());
             statement.executeUpdate();
         }
     }
@@ -178,26 +156,26 @@ public class Client {
     // ---------------------------
     // GET ALL
     // ---------------------------
-    public static List<Client> getAll() throws Exception {
+    public static List<Categorie> getAll() throws Exception {
         try (Connection connection = DBConnection.getConnection()) {
             return getAll(connection);
         }
     }
 
-    public static List<Client> getAll(Connection connection) throws SQLException {
-        List<Client> list = new ArrayList<>();
-        String sql = "SELECT * FROM client ORDER BY client_id";
+    public static List<Categorie> getAll(Connection connection) throws SQLException {
+        List<Categorie> list = new ArrayList<>();
+        String sql = "SELECT * FROM categorie ORDER BY id";
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                list.add(new Client(
-                        resultSet.getLong("client_id"),
+                int p = resultSet.getInt("prix");
+                Integer prixVal = resultSet.wasNull() ? null : p;
+                list.add(new Categorie(
+                        resultSet.getInt("id"),
                         resultSet.getString("nom"),
-                        resultSet.getString("address"),
-                        resultSet.getInt("age"),
-                        resultSet.getInt("id_categorie")
+                        prixVal
                 ));
             }
         }

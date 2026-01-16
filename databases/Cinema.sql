@@ -143,18 +143,31 @@ CREATE TABLE showtime (
 -- PostgreSQL 
 -- ============================================================
 
+-- Categorie --
+
+CREATE TABLE IF NOT EXISTS categorie (
+    id BIGSERIAL PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    prix INTEGER
+);
+
 -- =========================
 -- 1) CLIENT
 -- =========================
 CREATE TABLE IF NOT EXISTS client (
-    client_id  BIGSERIAL PRIMARY KEY,
-    nom        VARCHAR(120) NOT NULL,
-    address    VARCHAR(255),
-    age        INT CHECK (age >= 0),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    client_id     BIGSERIAL PRIMARY KEY,
+    id_categorie  BIGINT NOT NULL,
+    nom           VARCHAR(120) NOT NULL,
+    address       VARCHAR(255),
+    age           INT CHECK (age >= 0),
+    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_client_categorie
+        FOREIGN KEY (id_categorie)
+        REFERENCES categorie(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
-
-
 
 
 -- =========================

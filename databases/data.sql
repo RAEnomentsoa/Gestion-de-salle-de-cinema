@@ -15,6 +15,8 @@ TRUNCATE TABLE ticket RESTART IDENTITY CASCADE;
 TRUNCATE TABLE tarif RESTART IDENTITY CASCADE;
 TRUNCATE TABLE reservation RESTART IDENTITY CASCADE;
 TRUNCATE TABLE client RESTART IDENTITY CASCADE;
+TRUNCATE TABLE categorie RESTART IDENTITY;
+
 
 -- -------------------------
 -- 1) CINEMA
@@ -34,9 +36,10 @@ VALUES
 (1, 'Salle 3',20, 'MAINTENANCE');
 
 
-INSERT INTO tarif (nom, prix) VALUES('VIP', 90000.00);
+INSERT INTO tarif (nom, prix) VALUES
+('STANDARD', 20000.00),
 ('PREMIUM', 50000.00),
- ('VIP', 90000.00);
+('VIP', 90000.00);
 
 
 INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
@@ -106,17 +109,24 @@ INSERT INTO showtime (
 
 -- Done ✅
 
-INSERT INTO client (nom, address, age) VALUES
-('Client 1',  'Adresse 1',  22),
-('Client 2',  'Adresse 2',  25),
-('Client 3',  'Adresse 3',  30),
-('Client 4',  'Adresse 4',  28),
-('Client 5',  'Adresse 5',  35),
-('Client 6',  'Adresse 6',  40),
-('Client 7',  'Adresse 7',  18),
-('Client 8',  'Adresse 8',  27),
-('Client 9',  'Adresse 9',  33),
-('Client 10', 'Adresse 10', 45);
+-- Insertion des nouvelles données
+INSERT INTO categorie (id, nom, prix) VALUES
+(1, 'Enfant', 15000),
+(2, 'Adulte', NULL);
+
+
+INSERT INTO client (id_categorie, nom, address, age) VALUES
+(1, 'Client 1',  'Adresse 1',  22),
+(1, 'Client 2',  'Adresse 2',  25),
+(1, 'Client 3',  'Adresse 3',  30),
+(1, 'Client 4',  'Adresse 4',  28),
+
+(2, 'Client 5',  'Adresse 5',  35),
+(2, 'Client 6',  'Adresse 6',  40),
+(2, 'Client 7',  'Adresse 7',  18),
+(2, 'Client 8',  'Adresse 8',  27),
+(2, 'Client 9',  'Adresse 9',  33),
+(2, 'Client 10', 'Adresse 10', 45);
 
 
 INSERT INTO ticket (

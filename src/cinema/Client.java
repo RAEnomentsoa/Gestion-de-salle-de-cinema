@@ -7,28 +7,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Client {
+
     long id; // client_id
     String nom;
     String address;
     int age;
+    int id_categorie;
 
+    // ---------------------------
+    // CONSTRUCTEURS
+    // ---------------------------
     public Client() { }
 
     public Client(long id) {
         setId(id);
     }
 
-    public Client(long id, String nom, String address, int age) {
+    public Client(long id, String nom, String address, int age, int id_categorie) {
         setId(id);
         setNom(nom);
         setAddress(address);
         setAge(age);
+        setId_categorie(id_categorie);
     }
 
-    public Client(String nom, String address, int age) {
+    public Client(String nom, String address, int age, int id_categorie) {
         setNom(nom);
         setAddress(address);
         setAge(age);
+        setId_categorie(id_categorie);
     }
 
     // ---------------------------
@@ -66,30 +73,35 @@ public class Client {
         this.age = age;
     }
 
+    public int getId_categorie() {
+        return id_categorie;
+    }
+
+    public void setId_categorie(int id_categorie) {
+        this.id_categorie = id_categorie;
+    }
+
     // ---------------------------
     // CREATE
     // ---------------------------
     public void create() throws Exception {
-        Connection connection = null;
-        try {
-            connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection()) {
             create(connection);
-        } finally {
-            if (connection != null) connection.close();
         }
     }
 
     public void create(Connection connection) throws SQLException {
-        PreparedStatement statement = null;
-        try {
-            String sql = "INSERT INTO client (nom, address, age) VALUES (?, ?, ?)";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, this.getNom());
-            statement.setString(2, this.getAddress());
-            statement.setInt(3, this.getAge());
+        String sql = """
+            INSERT INTO client (id_categorie, nom, address, age)
+            VALUES (?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, this.getId_categorie());
+            statement.setString(2, this.getNom());
+            statement.setString(3, this.getAddress());
+            statement.setInt(4, this.getAge());
             statement.executeUpdate();
-        } finally {
-            if (statement != null) statement.close();
         }
     }
 
@@ -97,32 +109,25 @@ public class Client {
     // READ by ID
     // ---------------------------
     public void getById() throws Exception {
-        Connection connection = null;
-        try {
-            connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection()) {
             getById(connection);
-        } finally {
-            if (connection != null) connection.close();
         }
     }
 
     public void getById(Connection connection) throws SQLException {
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        try {
-            String sql = "SELECT * FROM client WHERE client_id = ?";
-            statement = connection.prepareStatement(sql);
-            statement.setLong(1, this.getId());
-            resultSet = statement.executeQuery();
+        String sql = "SELECT * FROM client WHERE client_id = ?";
 
-            if (resultSet.next()) {
-                this.setNom(resultSet.getString("nom"));
-                this.setAddress(resultSet.getString("address"));
-                this.setAge(resultSet.getInt("age"));
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, this.getId());
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    this.setNom(resultSet.getString("nom"));
+                    this.setAddress(resultSet.getString("address"));
+                    this.setAge(resultSet.getInt("age"));
+                    this.setId_categorie(resultSet.getInt("id_categorie"));
+                }
             }
-        } finally {
-            if (resultSet != null) resultSet.close();
-            if (statement != null) statement.close();
         }
     }
 
@@ -130,27 +135,25 @@ public class Client {
     // UPDATE
     // ---------------------------
     public void update() throws Exception {
-        Connection connection = null;
-        try {
-            connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection()) {
             update(connection);
-        } finally {
-            if (connection != null) connection.close();
         }
     }
 
     public void update(Connection connection) throws SQLException {
-        PreparedStatement statement = null;
-        try {
-            String sql = "UPDATE client SET nom = ?, address = ?, age = ? WHERE client_id = ?";
-            statement = connection.prepareStatement(sql);
+        String sql = """
+            UPDATE client
+            SET nom = ?, address = ?, age = ?, id_categorie = ?
+            WHERE client_id = ?
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, this.getNom());
             statement.setString(2, this.getAddress());
             statement.setInt(3, this.getAge());
-            statement.setLong(4, this.getId());
+            statement.setInt(4, this.getId_categorie());
+            statement.setLong(5, this.getId());
             statement.executeUpdate();
-        } finally {
-            if (statement != null) statement.close();
         }
     }
 
@@ -158,24 +161,17 @@ public class Client {
     // DELETE
     // ---------------------------
     public void delete() throws Exception {
-        Connection connection = null;
-        try {
-            connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection()) {
             delete(connection);
-        } finally {
-            if (connection != null) connection.close();
         }
     }
 
     public void delete(Connection connection) throws SQLException {
-        PreparedStatement statement = null;
-        try {
-            String sql = "DELETE FROM client WHERE client_id = ?";
-            statement = connection.prepareStatement(sql);
+        String sql = "DELETE FROM client WHERE client_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, this.getId());
             statement.executeUpdate();
-        } finally {
-            if (statement != null) statement.close();
         }
     }
 
@@ -183,38 +179,28 @@ public class Client {
     // GET ALL
     // ---------------------------
     public static List<Client> getAll() throws Exception {
-        Connection connection = null;
-        try {
-            connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection()) {
             return getAll(connection);
-        } finally {
-            if (connection != null) connection.close();
         }
     }
 
     public static List<Client> getAll(Connection connection) throws SQLException {
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
         List<Client> list = new ArrayList<>();
-        try {
-            String sql = "SELECT * FROM client ORDER BY client_id";
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery();
+        String sql = "SELECT * FROM client ORDER BY client_id";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
                 list.add(new Client(
                         resultSet.getLong("client_id"),
                         resultSet.getString("nom"),
                         resultSet.getString("address"),
-                        resultSet.getInt("age")
+                        resultSet.getInt("age"),
+                        resultSet.getInt("id_categorie")
                 ));
             }
-        } finally {
-            if (resultSet != null) resultSet.close();
-            if (statement != null) statement.close();
         }
         return list;
     }
-
-    
 }

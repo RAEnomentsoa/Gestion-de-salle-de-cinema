@@ -47,6 +47,7 @@ public class ClientServlet extends HttpServlet {
             String nom = request.getParameter("nom");
             String address = request.getParameter("address");
             String ageParam = request.getParameter("age");
+            String CategorieParam = request.getParameter("id_categorie");
 
             long id = 0;
             if (request.getParameter("id") != null && !request.getParameter("id").isEmpty()) {
@@ -60,6 +61,7 @@ public class ClientServlet extends HttpServlet {
                 client.setAge(Integer.parseInt(ageParam));
             }
             client.setId(id);
+            client.setId_categorie(Integer.parseInt(CategorieParam));
 
             if ("update".equals(action)) {
                 client.update();
