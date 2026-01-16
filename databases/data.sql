@@ -31,7 +31,7 @@ VALUES ('Cine Star', 'Avenue de l''Independance', 'Antananarivo', 'ACTIVE');
 -- -------------------------
 INSERT INTO room (cinema_id, name, capacity, status)
 VALUES
-(1, 'Salle 1',20, 'ACTIVE'),
+(1, 'Salle 1',20, 'ACTIVE');
 (1, 'Salle 2',20, 'ACTIVE'),
 (1, 'Salle 3',20, 'MAINTENANCE');
 
@@ -45,8 +45,8 @@ INSERT INTO tarif (nom, prix) VALUES
 INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
 -- Salle 1 → tarif_id = 1
 (1, 'A', 1, 1, TRUE),
-(1, 'A', 2, 1, TRUE),
-(1, 'A', 3, 1, TRUE),
+(1, 'A', 2, 2, TRUE),
+(1, 'A', 3, 3, TRUE);
 (1, 'A', 4, 1, TRUE),
 (1, 'A', 5, 1, TRUE),
 (1, 'A', 6, 1, TRUE),
@@ -156,5 +156,81 @@ INSERT INTO reservation (ticket_id, client_id, status) VALUES
 INSERT INTO app_user (username, password_hash, full_name, role, status)
 VALUES ('admin','admin123', 'Administrateur', 'ADMIN', 'ACTIVE');
 
+CREATE OR REPLACE VIEW reservation_report_view AS
+SELECT
+    r.reservation_id,
+    r.status AS reservation_status,
+    r.created_at AS reservation_created_at,
+    t.ticket_id,
+
+    -- Prix final : priorité categorie.prix, sinon tarif du siège
+    COALESCE(cat.prix, tr.prix) AS prix,
+
+    c.nom AS client_name,
+    ci.name AS cinema_name,
+    ro.room_id,
+    ro.name AS room_name,
+    m.movie_id,
+    m.title AS movie_title,
+    s.starts_at,
+    st.row_label AS seat_row,
+    st.seat_number
+FROM reservation r
+JOIN client c ON r.client_id = c.client_id
+JOIN categorie cat ON c.id_categorie = cat.id
+JOIN ticket t ON r.ticket_id = t.ticket_id
+JOIN showtime s ON t.showtime_id = s.showtime_id
+JOIN room ro ON s.room_id = ro.room_id
+JOIN cinema ci ON ro.cinema_id = ci.cinema_id
+JOIN movie m ON s.movie_id = m.movie_id
+LEFT JOIN seat st ON t.seat_id = st.seat_id
+LEFT JOIN tarif tr ON st.seat_type = tr.id;
 
 
+
+
+CREATE OR REPLACE VIEW reservation_report_view AS
+SELECT
+    r.reservation_id,
+    r.status AS reservation_status,
+    r.created_at AS reservation_created_at,
+    t.ticket_id,
+
+    -- Calcul prix selon catégorie et tarif
+    CASE
+        WHEN LOWER(cat.nom) = 'enfant' AND cat.prix IS NOT NULL AND tr.prix IS NOT NULL
+            THEN tr.prix * cat.prix / 100
+        WHEN cat.prix IS NOT NULL
+            THEN cat.prix
+        ELSE tr.prix
+    END AS prix,
+
+    c.nom AS client_name,
+    ci.name AS cinema_name,
+    ro.room_id,
+    ro.name AS room_name,
+    m.movie_id,
+    m.title AS movie_title,
+    s.starts_at,
+    st.row_label AS seat_row,
+    st.seat_number
+FROM reservation r
+JOIN client c ON r.client_id = c.client_id
+JOIN categorie cat ON c.id_categorie = cat.id
+JOIN ticket t ON r.ticket_id = t.ticket_id
+JOIN showtime s ON t.showtime_id = s.showtime_id
+JOIN room ro ON s.room_id = ro.room_id
+JOIN cinema ci ON ro.cinema_id = ci.cinema_id
+JOIN movie m ON s.movie_id = m.movie_id
+LEFT JOIN seat st ON t.seat_id = st.seat_id
+LEFT JOIN tarif tr ON st.seat_type = tr.id;
+
+UPDATE categorie
+SET prix = 50
+WHERE nom = 'Enfant';
+
+
+--- changement de VIP
+UPDATE tarif
+SET nom = 'VIP', prix = 120000
+WHERE id = 3;

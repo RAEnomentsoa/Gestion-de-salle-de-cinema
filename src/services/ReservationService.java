@@ -8,70 +8,39 @@ import java.util.*;
 
 public class ReservationService {
 
+    // ===========================
+    // Get Report
+    // ===========================
     public static List<ReservationReportRow> getReport(Long roomId, Long movieId) throws Exception {
 
-        String sql = """
-            SELECT
-                r.reservation_id,
-                r.status AS reservation_status,
-                r.created_at AS reservation_created_at,
-
-                t.ticket_id,
-                t.prix,
-
-                c.nom AS client_name,
-
-                ci.name AS cinema_name,
-                ro.name AS room_name,
-
-                m.title AS movie_title,
-
-                s.starts_at,
-
-                se.row_label AS seat_row,
-                se.seat_number AS seat_number
-
-            FROM reservation r
-            JOIN ticket t       ON r.ticket_id = t.ticket_id
-            JOIN showtime s     ON t.showtime_id = s.showtime_id
-            JOIN movie m        ON s.movie_id = m.movie_id
-            JOIN room ro        ON s.room_id = ro.room_id
-            JOIN cinema ci      ON ro.cinema_id = ci.cinema_id
-            JOIN client c       ON r.client_id = c.client_id
-            LEFT JOIN seat se   ON t.seat_id = se.seat_id
-
-            WHERE ( ? IS NULL OR ro.room_id = ? )
-              AND ( ? IS NULL OR m.movie_id = ? )
-
-            ORDER BY r.created_at DESC, r.reservation_id DESC
-        """;
+        String sql = "SELECT * FROM reservation_report_view "
+                   + "WHERE (? IS NULL OR room_id = ?) "
+                   + "AND (? IS NULL OR movie_id = ?) "
+                   + "ORDER BY reservation_created_at DESC";
 
         List<ReservationReportRow> list = new ArrayList<>();
 
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            // room filter
-            if (roomId == null) ps.setNull(1, Types.BIGINT);
-            else ps.setLong(1, roomId);
-            if (roomId == null) ps.setNull(2, Types.BIGINT);
-            else ps.setLong(2, roomId);
+            // Room filter
+            if (roomId == null) { ps.setNull(1, Types.BIGINT); ps.setNull(2, Types.BIGINT); }
+            else { ps.setLong(1, roomId); ps.setLong(2, roomId); }
 
-            // movie filter
-            if (movieId == null) ps.setNull(3, Types.BIGINT);
-            else ps.setLong(3, movieId);
-            if (movieId == null) ps.setNull(4, Types.BIGINT);
-            else ps.setLong(4, movieId);
+            // Movie filter
+            if (movieId == null) { ps.setNull(3, Types.BIGINT); ps.setNull(4, Types.BIGINT); }
+            else { ps.setLong(3, movieId); ps.setLong(4, movieId); }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ReservationReportRow row = new ReservationReportRow();
+
                     row.setReservationId(rs.getLong("reservation_id"));
                     row.setReservationStatus(rs.getString("reservation_status"));
                     row.setReservationCreatedAt(rs.getTimestamp("reservation_created_at"));
 
                     row.setTicketId(rs.getLong("ticket_id"));
-                    row.setPrix(rs.getDouble("prix"));
+                    row.setPrix(rs.getDouble("prix")); // déjà calculé dans la vue
 
                     row.setClientName(rs.getString("client_name"));
                     row.setCinemaName(rs.getString("cinema_name"));
@@ -90,28 +59,44 @@ public class ReservationService {
         return list;
     }
 
-    // Total chiffre d'affaire (I assume only PAYER counts)
+    // ===========================
+    // Total revenue (paid only)
+    // ===========================
     public static double getTotalRevenue(Long roomId, Long movieId) throws Exception {
+
         String sql = """
-            SELECT COALESCE(SUM(t.prix), 0) AS total
-            FROM reservation r
-            JOIN ticket t   ON r.ticket_id = t.ticket_id
-            JOIN showtime s ON t.showtime_id = s.showtime_id
-            JOIN movie m    ON s.movie_id = m.movie_id
-            JOIN room ro    ON s.room_id = ro.room_id
-            WHERE r.status = 'PAYER'
-              AND ( ? IS NULL OR ro.room_id = ? )
-              AND ( ? IS NULL OR m.movie_id = ? )
+           SELECT COALESCE(SUM(
+               CASE
+                   WHEN cat.prix IS NOT NULL THEN 
+                        ROUND(COALESCE(se_prix.prix, 0) * cat.prix / 100.0, 2)
+                   ELSE
+                        COALESCE(se_prix.prix, 0)
+               END
+           ), 0) AS total
+           FROM reservation r
+           JOIN client c ON r.client_id = c.client_id
+           JOIN categorie cat ON c.id_categorie = cat.id
+           JOIN ticket t ON r.ticket_id = t.ticket_id
+           JOIN showtime s ON t.showtime_id = s.showtime_id
+           JOIN room ro ON s.room_id = ro.room_id
+           JOIN movie m ON s.movie_id = m.movie_id
+           LEFT JOIN seat se ON t.seat_id = se.seat_id
+           LEFT JOIN tarif se_prix ON se.seat_type = se_prix.id
+           WHERE r.status = 'PAYER'
+             AND (? IS NULL OR ro.room_id = ?)
+             AND (? IS NULL OR m.movie_id = ?)
         """;
 
         try (Connection cn = DBConnection.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            if (roomId == null) ps.setNull(1, Types.BIGINT); else ps.setLong(1, roomId);
-            if (roomId == null) ps.setNull(2, Types.BIGINT); else ps.setLong(2, roomId);
+            // Room filter
+            if (roomId == null) { ps.setNull(1, Types.BIGINT); ps.setNull(2, Types.BIGINT); }
+            else { ps.setLong(1, roomId); ps.setLong(2, roomId); }
 
-            if (movieId == null) ps.setNull(3, Types.BIGINT); else ps.setLong(3, movieId);
-            if (movieId == null) ps.setNull(4, Types.BIGINT); else ps.setLong(4, movieId);
+            // Movie filter
+            if (movieId == null) { ps.setNull(3, Types.BIGINT); ps.setNull(4, Types.BIGINT); }
+            else { ps.setLong(3, movieId); ps.setLong(4, movieId); }
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getDouble("total");
@@ -119,4 +104,5 @@ public class ReservationService {
             }
         }
     }
+
 }
