@@ -1,3 +1,6 @@
+// ===============================
+// FILE: src/main/java/cinema/Societe.java
+// ===============================
 package cinema;
 
 import dao.DBConnection;
@@ -10,24 +13,26 @@ public class Societe {
 
     long id;
     String num;
-    double prix;
+    Double prix; // ✅ can be NULL
 
     // ---------------------------
     // CONSTRUCTEURS
     // ---------------------------
-    public Societe() {}
+    public Societe() {
+    }
 
     public Societe(long id) {
         setId(id);
     }
 
-    public Societe(long id, String num, double prix) {
+    // ✅ Constructor that accepts NULL
+    public Societe(long id, String num, Double prix) {
         setId(id);
         setNum(num);
         setPrix(prix);
     }
 
-    public Societe(String num, double prix) {
+    public Societe(String num, Double prix) {
         setNum(num);
         setPrix(prix);
     }
@@ -51,11 +56,11 @@ public class Societe {
         this.num = num;
     }
 
-    public double getPrix() {
+    public Double getPrix() {
         return prix;
     }
 
-    public void setPrix(double prix) {
+    public void setPrix(Double prix) {
         this.prix = prix;
     }
 
@@ -69,14 +74,16 @@ public class Societe {
     }
 
     public void create(Connection connection) throws SQLException {
-        String sql = """
-            INSERT INTO societe (num, prix)
-            VALUES (?, ?)
-        """;
+        String sql = "INSERT INTO societe (num, prix) VALUES (?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, getNum());
-            ps.setDouble(2, getPrix());
+
+            if (getPrix() == null)
+                ps.setNull(2, Types.NUMERIC);
+            else
+                ps.setDouble(2, getPrix());
+
             ps.executeUpdate();
         }
     }
@@ -99,7 +106,12 @@ public class Societe {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     setNum(rs.getString("num"));
-                    setPrix(rs.getDouble("prix"));
+
+                    double p = rs.getDouble("prix");
+                    if (rs.wasNull())
+                        setPrix(null);
+                    else
+                        setPrix(p);
                 }
             }
         }
@@ -115,15 +127,16 @@ public class Societe {
     }
 
     public void update(Connection connection) throws SQLException {
-        String sql = """
-            UPDATE societe
-            SET num = ?, prix = ?
-            WHERE id = ?
-        """;
+        String sql = "UPDATE societe SET num = ?, prix = ? WHERE id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, getNum());
-            ps.setDouble(2, getPrix());
+
+            if (getPrix() == null)
+                ps.setNull(2, Types.NUMERIC);
+            else
+                ps.setDouble(2, getPrix());
+
             ps.setLong(3, getId());
             ps.executeUpdate();
         }
@@ -161,14 +174,18 @@ public class Societe {
         String sql = "SELECT * FROM societe ORDER BY id";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                Double prix = null;
+                double p = rs.getDouble("prix");
+                if (!rs.wasNull())
+                    prix = p;
+
                 list.add(new Societe(
                         rs.getLong("id"),
                         rs.getString("num"),
-                        rs.getDouble("prix")
-                ));
+                        prix));
             }
         }
         return list;

@@ -77,6 +77,15 @@
                     <div data-i18n="PaiementFormServlet">Paiement</div>
                 </a>
             </li>
+
+            <!-- societe -->
+            <li class="menu-item <%= "societe".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="societe" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-building"></i>
+                    <div data-i18n="societe">Société</div>
+                </a>
+            </li>
+
         
 
              <!-- client -->
