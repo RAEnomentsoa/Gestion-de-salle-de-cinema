@@ -68,6 +68,14 @@
                 </a>
             </li>
 
+             <li class="menu-item <%= "PaiementFormServlet".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="PaiementFormServlet" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-receipt"></i>
+                    <div data-i18n="PaiementFormServlet">Paiement</div>
+                </a>
+            </li>
+        
+
              <!-- client -->
             <li class="menu-item <%= "client".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="client" class="menu-link">
@@ -75,12 +83,18 @@
                     <div data-i18n="client">client</div>
                 </a>
             </li>
-
             <!-- reservation -->
             <li class="menu-item <%= "reservation".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="reservation" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-bookmark"></i>
                     <div data-i18n="reservation">Reservation</div>
+                </a>
+            </li>
+
+            <li class="menu-item <%= "pubRevenueReport".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="pubRevenueReport" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-bookmark"></i>
+                    <div data-i18n="pubRevenueReport">pubRevenueReport</div>
                 </a>
             </li>
 

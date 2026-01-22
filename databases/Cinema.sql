@@ -254,6 +254,67 @@ CREATE INDEX idx_cat_tarif_pricing_cat ON categorie_tarif_pricing(categorie_id);
 CREATE INDEX idx_cat_tarif_pricing_tarif ON categorie_tarif_pricing(tarif_id);
 
 
+----////////////////
 
+CREATE TABLE pub_tarif (
+    id    BIGSERIAL PRIMARY KEY,
+    prix  NUMERIC(10,2) NOT NULL CHECK (prix >= 0)
+);
+
+
+CREATE TABLE societe (
+    id    BIGSERIAL PRIMARY KEY,
+    num   VARCHAR(50) NOT NULL UNIQUE,
+    prix  NUMERIC(10,2)
+);
+
+
+CREATE TABLE pub (
+    id           BIGSERIAL PRIMARY KEY,
+
+    showtime_id  BIGINT NOT NULL,
+    dates        TIMESTAMP NOT NULL,
+    id_prix      BIGINT NOT NULL,
+
+    CONSTRAINT fk_pub_showtime
+        FOREIGN KEY (showtime_id)
+        REFERENCES showtime(showtime_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_pub_tarif
+        FOREIGN KEY (id_prix)
+        REFERENCES pub_tarif(id)
+);
+
+ALTER TABLE pub
+ADD COLUMN id_societe BIGINT NOT NULL;
+
+ALTER TABLE pub
+ADD CONSTRAINT fk_pub_societe
+FOREIGN KEY (id_societe)
+REFERENCES societe(id)
+ON DELETE RESTRICT;
+
+
+CREATE INDEX idx_pub_showtime ON pub(showtime_id);
+CREATE INDEX idx_pub_date ON pub(dates);
+
+
+
+CREATE TABLE paiement (
+    id         BIGSERIAL PRIMARY KEY,
+    id_societe BIGINT NOT NULL,
+    montant    NUMERIC(12,2) NOT NULL CHECK (montant >= 0),
+    date       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_paiement_societe
+        FOREIGN KEY (id_societe)
+        REFERENCES societe(id)
+        ON DELETE CASCADE
+);
+
+-- Index pour accélérer les recherches par société ou par date
+CREATE INDEX idx_paiement_societe ON paiement(id_societe);
+CREATE INDEX idx_paiement_date ON paiement(date);
 
 
