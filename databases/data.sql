@@ -31,7 +31,7 @@ VALUES ('Cine Star', 'Avenue de l''Independance', 'Antananarivo', 'ACTIVE');
 -- -------------------------
 INSERT INTO room (cinema_id, name, capacity, status)
 VALUES
-(1, 'Salle 1',20, 'ACTIVE');
+(1, 'Salle 1',20, 'ACTIVE'),
 (1, 'Salle 2',20, 'ACTIVE'),
 (1, 'Salle 3',20, 'MAINTENANCE');
 
@@ -46,7 +46,7 @@ INSERT INTO seat (room_id, row_label, seat_number, seat_type, is_active) VALUES
 -- Salle 1 → tarif_id = 1
 (1, 'A', 1, 1, TRUE),
 (1, 'A', 2, 2, TRUE),
-(1, 'A', 3, 3, TRUE);
+(1, 'A', 3, 3, TRUE),
 (1, 'A', 4, 1, TRUE),
 (1, 'A', 5, 1, TRUE),
 (1, 'A', 6, 1, TRUE),

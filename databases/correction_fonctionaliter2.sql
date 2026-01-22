@@ -76,7 +76,7 @@ String sql = """
 INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, percent_rate)
 VALUES (
   (SELECT id FROM categorie WHERE LOWER(nom)='enfant'),
-  (SELECT id FROM tarif WHERE LOWER(nom)='normal'),
+  (SELECT id FROM tarif WHERE LOWER(nom)='premium'),
   'PERCENT',
   50
 );
@@ -86,5 +86,37 @@ VALUES (
   (SELECT id FROM categorie WHERE LOWER(nom)='enfant'),
   (SELECT id FROM tarif WHERE LOWER(nom)='vip'),
   'FIXED',
-  20000
+  5000
+);
+
+INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, fixed_price)
+VALUES (
+  (SELECT id FROM categorie WHERE LOWER(nom)='adulte'),
+  (SELECT id FROM tarif WHERE LOWER(nom)='vip'),
+  'FIXED',
+  5000
+);
+
+INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, fixed_price)
+VALUES (
+  (SELECT id FROM categorie WHERE LOWER(nom)='adulte'),
+  (SELECT id FROM tarif WHERE LOWER(nom)='standard'),
+  'FIXED',
+  5000
+);
+
+INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, fixed_price)
+VALUES (
+  (SELECT id FROM categorie WHERE LOWER(nom)='enfant'),
+  (SELECT id FROM tarif WHERE LOWER(nom)='standard'),
+  'FIXED',
+  5000
+);
+
+INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, fixed_price)
+VALUES (
+  (SELECT id FROM categorie WHERE LOWER(nom)='adulte'),
+  (SELECT id FROM tarif WHERE LOWER(nom)='premium'),
+  'FIXED',
+  5000
 );
