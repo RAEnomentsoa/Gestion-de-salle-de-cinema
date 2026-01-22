@@ -1,12 +1,14 @@
 package servlet;
 
 import cinema.AppUser;
+import cinema.Room;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -26,9 +28,12 @@ public class LoginServlet extends HttpServlet {
             AppUser user = new AppUser();
             boolean ok = user.login(username, password);
 
+            List<Room> rooms = Room.getAll();
+
             if (ok) {
                 HttpSession session = req.getSession(true);
                 session.setAttribute("user", user);
+                session.setAttribute("Vertical_menu_rooms", rooms);
                 resp.sendRedirect("movie"); // default after login
             } else {
                 req.setAttribute("error", "Identifiants incorrects.");

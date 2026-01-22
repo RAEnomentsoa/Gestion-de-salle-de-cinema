@@ -1,4 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="cinema.Room" %>
+
 <%
     String activeMenuItem = (String) request.getAttribute("activeMenuItem");
 %>
@@ -90,6 +93,22 @@
                     <div data-i18n="reservation">Reservation</div>
                 </a>
             </li>
+            <!-- pub revenue --> 
+              <li class="menu-item <%= "pub".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="pub" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-bookmark"></i>
+                    <div data-i18n="pub">Pub</div>
+                </a>
+            </li>
+            <%-- pub reste --%>
+            <li class="menu-item <%= "pubReste".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="pubReste" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-wallet"></i>
+                    <div data-i18n="pubReste">Reste Pub</div>
+                </a>
+                </li>
+
+
 
             <li class="menu-item <%= "pubRevenueReport".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="pubRevenueReport" class="menu-link">
@@ -98,34 +117,44 @@
                 </a>
             </li>
 
-             <!-- room revenue -->
-            <li class="menu-item <%= "roomRevenue".equals(activeMenuItem) ? "active" : "" %>">
-                 <a href="javascript:void(0);" class="menu-link dropdown-toggle">
-                <i class="menu-icon tf-icons bx bx-door-open"></i>
-                <div data-i18n="Stock">Salle</div>
-                <i class="bx bx-chevron-down dropdown-icon"></i>
-            </a>
-                 <ul class="dropdown-menu">
-                    <li class="menu-item">
-                        <a href="roomRevenue?room_id=1" class="menu-link">
-                            <i class="bx bx-circle me-2"></i>
-                            Salle 1
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="roomRevenue?room_id=2" class="menu-link">
-                            <i class="bx bx-circle me-2"></i>
-                            Salle 2
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="roomRevenue?room_id=3" class="menu-link">
-                            <i class="bx bx-circle me-2"></i>
-                            Salle 3
-                        </a>
-                    </li>
-                </ul>
-            </li>
+                    <!-- room revenue (dynamic from session) -->
+                <li class="menu-item <%= "roomRevenue".equals(activeMenuItem) ? "active" : "" %>">
+                    <a href="javascript:void(0);" class="menu-link dropdown-toggle">
+                        <i class="menu-icon tf-icons bx bx-door-open"></i>
+                        <div data-i18n="Salle">Salle</div>
+                        <i class="bx bx-chevron-down dropdown-icon"></i>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <%
+                            List<Room> menuRooms = (List<Room>) session.getAttribute("Vertical_menu_rooms");
+                           if (menuRooms != null && !menuRooms.isEmpty()) {
+                                       for (Room r : menuRooms) {
+                        %>
+                            <li class="menu-item">
+                                <a href="roomRevenue?room_id=<%= r.getId() %>" class="menu-link">
+                                    <i class="bx bx-circle me-2"></i>
+                                    <%= (r.getName() != null && !r.getName().isBlank())
+                                            ? r.getName()
+                                            : ("Salle " + r.getId()) %>
+                                </a>
+                            </li>
+                        <%
+                                }
+                            } else {
+                        %>
+                            <li class="menu-item">
+                                <span class="menu-link text-muted">
+                                    <i class="bx bx-circle me-2"></i>
+                                    Aucune salle
+                                </span>
+                            </li>
+                        <%
+                            }
+                        %>
+                    </ul>
+                </li>
+
 
             <!-- Report / Vente -->
             <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
