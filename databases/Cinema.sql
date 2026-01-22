@@ -228,6 +228,32 @@ CREATE TABLE app_user (
 );
 
 
+CREATE TABLE categorie_tarif_pricing (
+  id           BIGSERIAL PRIMARY KEY,
+  categorie_id BIGINT NOT NULL REFERENCES categorie(id) ON DELETE CASCADE,
+  tarif_id     BIGINT NOT NULL REFERENCES tarif(id)     ON DELETE CASCADE,
+
+  pricing_type VARCHAR(10) NOT NULL CHECK (pricing_type IN ('PERCENT', 'FIXED')),
+
+  percent_rate NUMERIC(5,2) CHECK (percent_rate > 0 AND percent_rate <= 100),
+  fixed_price  NUMERIC(10,2) CHECK (fixed_price >= 0),
+
+  -- one rule per (categorie, tarif)
+  CONSTRAINT uq_cat_tarif UNIQUE (categorie_id, tarif_id),
+
+  -- force coherence: if PERCENT => percent_rate required, if FIXED => fixed_price required
+  CONSTRAINT ck_cat_tarif_pricing
+  CHECK (
+    (pricing_type = 'PERCENT' AND percent_rate IS NOT NULL AND fixed_price IS NULL)
+    OR
+    (pricing_type = 'FIXED'   AND fixed_price  IS NOT NULL AND percent_rate IS NULL)
+  )
+);
+
+CREATE INDEX idx_cat_tarif_pricing_cat ON categorie_tarif_pricing(categorie_id);
+CREATE INDEX idx_cat_tarif_pricing_tarif ON categorie_tarif_pricing(tarif_id);
+
+
 
 
 
