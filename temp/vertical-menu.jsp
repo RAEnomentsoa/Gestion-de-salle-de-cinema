@@ -78,6 +78,13 @@
                 </a>
             </li>
 
+             <li class="menu-item <%= "ShowtimeRevenueReportServlet".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="ShowtimeRevenueReportServlet" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-money"></i>
+                    <div data-i18n="ShowtimeRevenueReportServlet">ShowtimeRevenueReportServlet</div>
+                </a>
+            </li>
+
             <!-- societe -->
             <li class="menu-item <%= "societe".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="societe" class="menu-link">
@@ -85,7 +92,14 @@
                     <div data-i18n="societe">Société</div>
                 </a>
             </li>
-
+            
+             <!-- reste a payer par pub -->
+            <li class="menu-item <%= "ListeShowtimeServlet".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="ListeShowtimeServlet" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-building"></i>
+                    <div data-i18n="ListeShowtimeServlet">Reste a payer par diffusion</div>
+                </a>
+            </li>
         
 
              <!-- client -->

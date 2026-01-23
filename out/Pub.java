@@ -269,4 +269,212 @@ public class Pub {
         // Retourne le reste à payer
         return totalPub - totalPaye;
     }
+
+
+    public static List<Pub> getAllPubByIdShowtime(long showtimeId) throws Exception {
+    List<Pub> list = new ArrayList<>();
+
+    String sql = """
+        SELECT *
+        FROM pub
+        WHERE showtime_id = ?
+        ORDER BY id
+    """;
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, showtimeId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Pub(
+                    rs.getLong("id"),
+                    rs.getLong("showtime_id"),
+                    rs.getLong("id_societe"),
+                    rs.getTimestamp("dates"),
+                    rs.getLong("id_prix")
+                ));
+            }
+        }
+    }
+    return list;
+}
+
+
+public static double getTotalAPayer(long showtimeId) throws Exception {
+
+    String sql = """
+        SELECT COALESCE(SUM(pt.prix), 0) AS total
+        FROM pub p
+        JOIN pub_tarif pt ON p.id_prix = pt.id
+        WHERE p.showtime_id = ?
+    """;
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, showtimeId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+public static double getTotalMontantPayeByIdShowtime(
+        long showtimeId,
+        long societeId
+) throws Exception {
+
+    String sql = """
+        SELECT COALESCE(SUM(pa.montant), 0) AS total_paye
+        FROM paiement pa
+        WHERE pa.id_societe = ?
+    """;
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, societeId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total_paye");
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+public static double getPourcentage(long showtimeId, long societeId) throws Exception {
+
+    double totalAPayer = getTotalAPayer(showtimeId);
+    if (totalAPayer == 0) return 0;
+
+    double totalPaye = getTotalMontantPayeByIdShowtime(showtimeId, societeId);
+
+    return totalPaye / totalAPayer;
+}
+
+
+
+public double getPrixPub() throws Exception {
+
+    String sql = "SELECT prix FROM pub_tarif WHERE id = ?";
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, id_prix);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("prix");
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+public static double getTotalPubParSocieteParShowtime(
+        long societeId,
+        long showtimeId
+) throws SQLException {
+
+    String sql = """
+        SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
+        FROM pub p
+        JOIN pub_tarif pt ON p.id_prix = pt.id
+        LEFT JOIN societe s ON p.id_societe = s.id
+        WHERE p.id_societe = ?
+          AND p.showtime_id = ?
+    """;
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, societeId);
+        ps.setLong(2, showtimeId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total_pub");
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+
+public static double getTotalPubParSociete(long societeId) throws SQLException {
+
+    String sql = """
+        SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
+        FROM pub p
+        JOIN pub_tarif pt ON p.id_prix = pt.id
+        LEFT JOIN societe s ON p.id_societe = s.id
+        WHERE p.id_societe = ?
+    """;
+
+    try (Connection cn = DBConnection.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+        ps.setLong(1, societeId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total_pub");
+            }
+        }
+    }
+    return 0;
+}
+
+
+public static double resteAPayerParSocieteParIdShowtime(
+        long societeId,
+        long showtimeId
+) throws Exception {
+
+    // 1. Total pub pour ce showtime
+    double totalPubShowtime =
+            getTotalPubParSocieteParShowtime(societeId, showtimeId);
+
+    if (totalPubShowtime == 0) return 0;
+
+    // 2. Total pub global société
+    double totalPubSociete =
+            getTotalPubParSociete(societeId);
+
+    if (totalPubSociete == 0) return totalPubShowtime;
+
+    // 3. Total payé global société
+    double totalPaye =
+            getTotalMontantPayeByIdShowtime(showtimeId, societeId);
+
+    // 4. Part payée pour ce showtime (proportionnelle)
+    double partPayeShowtime =
+            (totalPubShowtime / totalPubSociete) * totalPaye;
+
+    // 5. Reste à payer
+    return totalPubShowtime - partPayeShowtime;
+}
+
+
+
+
+
+
 }

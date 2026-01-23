@@ -166,4 +166,475 @@ faite reference a cete formualrei et la creeer tout de suite :
 comme cette servlet, faites reference a elle et en utlisant cette fonction AjouterNouvellePub pour l'inssertion 
 
 
+-----------------------
+nouveau  concept 
+0bjectif : calculer et afficher le reste a payer par chaque diffusion de pub 
 
+1- on a beosin ue table pub ( deja existante)
+CREATE TABLE pub (
+    id           BIGSERIAL PRIMARY KEY,
+
+    showtime_id  BIGINT NOT NULL,
+    dates        TIMESTAMP NOT NULL,
+    id_prix      BIGINT NOT NULL,
+
+    CONSTRAINT fk_pub_showtime
+        FOREIGN KEY (showtime_id)
+        REFERENCES showtime(showtime_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_pub_tarif
+        FOREIGN KEY (id_prix)
+        REFERENCES pub_tarif(id)
+);
+
+ALTER TABLE pub
+ADD COLUMN id_societe BIGINT NOT NULL;
+
+ALTER TABLE pub
+ADD CONSTRAINT fk_pub_societe
+FOREIGN KEY (id_societe)
+REFERENCES societe(id)
+ON DELETE RESTRICT;
+
+
+CREATE INDEX idx_pub_showtime ON pub(showtime_id);
+CREATE INDEX idx_pub_date ON pub(dates);
+
+
+CREATE TABLE pub_tarif (
+    id    BIGSERIAL PRIMARY KEY,
+    prix  NUMERIC(10,2) NOT NULL CHECK (prix >= 0)
+);
+
+INSERT INTO pub_tarif (prix) VALUES
+    (200000);
+
+
+
+par exemple : 
+id  id_showtime id_societe  dates   id_prix 
+1         1         1          x    1
+2         1         1          x    1
+3         1         1          x    1
+4         1         1          x    1
+
+
+et on avait une liste paiement 
+on a deja cette table paiement
+
+CREATE TABLE paiement (
+    id         BIGSERIAL PRIMARY KEY,
+    id_societe BIGINT NOT NULL,
+    montant    NUMERIC(12,2) NOT NULL CHECK (montant >= 0),
+    date       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_paiement_societe
+        FOREIGN KEY (id_societe)
+        REFERENCES societe(id)
+        ON DELETE CASCADE
+);
+
+-- Index pour accélérer les recherches par société ou par date
+CREATE INDEX idx_paiement_societe ON paiement(id_societe);
+CREATE INDEX idx_paiement_date ON paiement(date);
+
+donnee par exmeple:
+id      id_societe      montant     date
+1           1           100000         x
+2           1           50000          x
+
+
+on doit avoir la somme de montant paye par une soiciete pour une showtime 
+fonction a creer : getTotalMontatPayeByIdShowtime
+ici total montant paye est : 150000 
+
+creer une focntion pour ceci : getTotalAPayer: ici, c'est 600000
+        String sqlTotalPaye = """
+                    SELECT COALESCE(SUM(montant), 0) AS total_paye
+                    FROM paiement
+                    WHERE id_societe = ?
+                """;
+
+on a cette fonction dans Pub.java:  resteAPayerParSociete qui calcule le reste a payer 
+ici, le reste a payer c'est 450000 
+
+creer une focniton getPourcentage qui retourne une pourcentage en utilisant ces deux fonctions :
+poucentage de  getTotalMontatPayeByIdShowtime par getTotalAPayer
+ici , il retourne une pourcentage : 25% 
+
+creer dans Pub.getAllPubByIdShowtime qui retourne la liste de pub dans une showtime
+
+et dans l'affichage, on creer une pub-reste-a-payer.jsp 
+comme suit, ajouter une colonne reste a payer en utilisant ces fonctionnalites ci dessus 
+
+voici cette page 
+# pour un id_showtime:
+reste a payer c'est ( pub.id_prix ( qui est liee au prix de pub_tarif ( ici c'est 200000)  - pourcentage( venant cette fonction creer cu desus) de pub.id_prix ))
+ici : reste a payer pour chaque pub c'est :
+id   ..... reste a payer
+1           150000
+2           150000
+3           150000
+4           150000
+
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="cinema.Pub" %>
+<%@include file="header.jsp"%>
+
+<div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+        <%@include file="vertical-menu.jsp"%>
+
+        <div class="layout-page">
+            <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+                 id="layout-navbar">
+                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                    <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                        <i class="bx bx-menu bx-sm"></i>
+                    </a>
+                </div>
+
+                <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                    <ul class="navbar-nav flex-row align-items-center ms-auto">
+                        <%-- <%@ include file="user.jsp" %> --%>
+                        <a href="logout" class="btn btn-outline-danger btn-sm">Logout</a>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="container-xxl flex-grow-1 container-p-y">
+
+                    <h4 class="fw-bold py-3 mb-4">
+                        <span class="text-muted fw-light">Pub /</span> Pubs
+                    </h4>
+
+                    <div class="card">
+                        <h5 class="card-header">Liste des pubs</h5>
+
+                        <div class="card-body">
+                            <!-- Go to Pub form servlet -->
+                            <a href="pubForm" type="button" class="btn btn-success">Ajouter</a>
+                        </div>
+
+                        <div class="table-responsive text-nowrap" style="overflow-x: visible;">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Showtime</th>
+                                    <th>Société</th>
+                                    <th>Date</th>
+                                    <th>Tarif</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+
+                                <tbody class="table-border-bottom-0">
+                                <%
+                                    List<Pub> pubs = (List<Pub>) request.getAttribute("pubs");
+                                    if (pubs != null) {
+                                        for (Pub p : pubs) {
+                                %>
+                                    <tr>
+                                        <td><strong><%= p.getId() %></strong></td>
+                                        <td><%= p.getShowtime_id() %></td>
+                                        <td><%= p.getId_societe() %></td>
+                                        <td><%= p.getDates() %></td>
+                                        <td><%= p.getId_prix() %></td>
+
+                                        <td>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="pubForm?action=update&id=<%= p.getId() %>">
+                                                        <i class="bx bx-edit-alt me-1"></i> Modifier
+                                                    </a>
+                                                    <a class="dropdown-item" href="pub?action=delete&id=<%= p.getId() %>">
+                                                        <i class="bx bx-trash me-1"></i> Supprimer
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <%
+                                        }
+                                    }
+                                %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<%@include file="footer.jsp" %>
+
+
+-------------------
+
+creer une page affichant la liste de showtime et value = l'id de showtime ( en utilse getters et setters )
+voici la classe showtime 
+
+package cinema;
+
+import dao.DBConnection;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Showtime {
+    long id; // showtime_id
+    long roomId;
+    long movieId;
+    Timestamp startsAt;
+    Timestamp endsAt;
+    String status; // SCHEDULED/OPEN/CLOSED/CANCELED
+
+    public Showtime() {
+    }
+
+    public Showtime(long id) {
+        setId(id);
+    }
+
+    public Showtime(long id, long roomId, long movieId, Timestamp startsAt, Timestamp endsAt, String status) {
+        setId(id);
+        setRoomId(roomId);
+        setMovieId(movieId);
+        setStartsAt(startsAt);
+        setEndsAt(endsAt);
+        setStatus(status);
+    }
+
+    public Showtime(long roomId, long movieId, Timestamp startsAt, Timestamp endsAt,
+            String status) {
+        setRoomId(roomId);
+        setMovieId(movieId);
+        setStartsAt(startsAt);
+        setEndsAt(endsAt);
+        setStatus(status);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(long roomId) {
+        this.roomId = roomId;
+    }
+
+    public long getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(long movieId) {
+        this.movieId = movieId;
+    }
+
+    public Timestamp getStartsAt() {
+        return startsAt;
+    }
+
+    public void setStartsAt(Timestamp startsAt) {
+        this.startsAt = startsAt;
+    }
+
+    public Timestamp getEndsAt() {
+        return endsAt;
+    }
+
+    public void setEndsAt(Timestamp endsAt) {
+        this.endsAt = endsAt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void create() throws Exception {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            create(connection);
+        } finally {
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void create(Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            String sql = "INSERT INTO showtime ( room_id, movie_id, starts_at, ends_at, status) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?)";
+            statement = connection.prepareStatement(sql);
+            statement.setLong(2, this.getRoomId());
+            statement.setLong(3, this.getMovieId());
+            statement.setTimestamp(4, this.getStartsAt());
+            statement.setTimestamp(5, this.getEndsAt());
+            statement.setString(7, (this.getStatus() == null) ? "SCHEDULED" : this.getStatus());
+            statement.executeUpdate();
+        } finally {
+            if (statement != null)
+                statement.close();
+        }
+    }
+
+    public void getById() throws Exception {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            getById(connection);
+        } finally {
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void getById(Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            String sql = "SELECT * FROM showtime WHERE showtime_id = ?";
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1, this.getId());
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.setRoomId(resultSet.getLong("room_id"));
+                this.setMovieId(resultSet.getLong("movie_id"));
+                this.setStartsAt(resultSet.getTimestamp("starts_at"));
+                this.setEndsAt(resultSet.getTimestamp("ends_at"));
+                this.setStatus(resultSet.getString("status"));
+            }
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (statement != null)
+                statement.close();
+        }
+    }
+
+    public void update() throws Exception {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            update(connection);
+        } finally {
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void update(Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            String sql = "UPDATE showtime SET cinema_id = ?, room_id = ?, movie_id = ?, starts_at = ?, ends_at = ?, base_price = ?, status = ? "
+                    +
+                    "WHERE showtime_id = ?";
+            statement = connection.prepareStatement(sql);
+            statement.setLong(2, this.getRoomId());
+            statement.setLong(3, this.getMovieId());
+            statement.setTimestamp(4, this.getStartsAt());
+            statement.setTimestamp(5, this.getEndsAt());
+            statement.setString(7, this.getStatus());
+            statement.setLong(8, this.getId());
+            statement.executeUpdate();
+        } finally {
+            if (statement != null)
+                statement.close();
+        }
+    }
+
+    public void delete() throws Exception {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            delete(connection);
+        } finally {
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void delete(Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            String sql = "DELETE FROM showtime WHERE showtime_id = ?";
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1, this.getId());
+            statement.executeUpdate();
+        } finally {
+            if (statement != null)
+                statement.close();
+        }
+    }
+
+    public static List<Showtime> getAll() throws Exception {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            return getAll(connection);
+        } finally {
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public static List<Showtime> getAll(Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        List<Showtime> list = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM showtime ORDER BY showtime_id";
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                list.add(new Showtime(
+                        resultSet.getLong("showtime_id"),
+                        resultSet.getLong("room_id"),
+                        resultSet.getLong("movie_id"),
+                        resultSet.getTimestamp("starts_at"),
+                        resultSet.getTimestamp("ends_at"),
+                        resultSet.getString("status")));
+            }
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (statement != null)
+                statement.close();
+        }
+        return list;
+    }
+}
+
+
+
+puis creer une page.jsp qui affiche une liste de showtime et le rediriger vers PubResteAPayerServlet?id_showtime= id_showtime selectionne
+
+voila le shema
+
+liste_showtime.jsp -> redirige vers PubResteAPayerServlet?id_showtime=idselectionne 

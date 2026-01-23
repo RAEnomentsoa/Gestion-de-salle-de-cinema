@@ -10,7 +10,7 @@ public class DBConnection {
     private static final String URL = "jdbc:postgresql://localhost:5432/cinema_managements";
     private static final String USER = "postgres";
     // private static final String PASSWORD = "postgres";
-    private static final String PASSWORD = "Andry2004#";
+    private static final String PASSWORD = "postgres";
 
     // load PostgreSQL driver
     static {
@@ -26,3 +26,4 @@ public class DBConnection {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
+
