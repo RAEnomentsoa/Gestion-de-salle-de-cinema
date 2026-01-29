@@ -78,12 +78,12 @@
                 </a>
             </li>
 
-             <li class="menu-item <%= "ShowtimeRevenueReportServlet".equals(activeMenuItem) ? "active" : "" %>">
+             <%-- <li class="menu-item <%= "ShowtimeRevenueReportServlet".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="ShowtimeRevenueReportServlet" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-money"></i>
                     <div data-i18n="ShowtimeRevenueReportServlet">ShowtimeRevenueReportServlet</div>
                 </a>
-            </li>
+            </li> --%>
 
             <!-- societe -->
             <li class="menu-item <%= "societe".equals(activeMenuItem) ? "active" : "" %>">
@@ -93,13 +93,13 @@
                 </a>
             </li>
             
-             <!-- reste a payer par pub -->
+             <%-- <!-- reste a payer par pub -->
             <li class="menu-item <%= "ListeShowtimeServlet".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="ListeShowtimeServlet" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-building"></i>
                     <div data-i18n="ListeShowtimeServlet">Reste a payer par diffusion</div>
                 </a>
-            </li>
+            </li> --%>
         
 
              <!-- client -->
@@ -124,7 +124,7 @@
                 </a>
             </li>
             <%-- pub reste --%>
-            <li class="menu-item <%= "pubReste".equals(activeMenuItem) ? "active" : "" %>">
+            <%-- <li class="menu-item <%= "pubReste".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="pubReste" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-wallet"></i>
                     <div data-i18n="pubReste">Reste Pub</div>
@@ -138,7 +138,7 @@
                     <i class="menu-icon tf-icons bx bx-dollar-circle"></i>
                     <div data-i18n="pubRevenueReport">Pub Revenue</div>
                 </a>
-            </li>
+            </li> --%>
 
                     <!-- room revenue (dynamic from session) -->
                 <li class="menu-item <%= "roomRevenue".equals(activeMenuItem) ? "active" : "" %>">
@@ -178,7 +178,7 @@
                     </ul>
                 </li>
 
-
+            <%-- Ato ny resaka rapport rehetra --%>
             <!-- Report / Vente -->
             <li class="menu-item <%= "reservationReport".equals(activeMenuItem) ? "active" : "" %>">
                 <a href="javascript:void(0);" class="menu-link dropdown-toggle">
@@ -189,10 +189,41 @@
                 <ul class="dropdown-menu">
                     <li class="menu-item">
                         <a href="reservationReport" class="menu-link">
-                            <i class="bx bx-circle me-2"></i>
+
+                           <i class="menu-icon tf-icons bx bx-dollar-circle"></i>
                             Rapport Réservations
                         </a>
                     </li>
+                <%-- Pub revenue --%>
+                <li class="menu-item <%= "pubRevenueReport".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="pubRevenueReport" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-dollar-circle"></i>
+                    <div data-i18n="pubRevenueReport">Pub Revenue</div>
+                </a>
+            </li>
+                <%-- pub reste --%>
+              <li class="menu-item <%= "pubReste".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="pubReste" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-wallet"></i>
+                    <div data-i18n="pubReste">Reste Pub</div>
+                </a>
+                </li>
+
+                   <!-- reste a payer par pub -->
+            <li class="menu-item <%= "ListeShowtimeServlet".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="ListeShowtimeServlet" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-building"></i>
+                    <div data-i18n="ListeShowtimeServlet">Reste a payer par diffusion</div>
+                </a>
+            </li>
+                <%-- showtime revenue Repport  --%>
+            <li class="menu-item <%= "ShowtimeRevenueReportServlet".equals(activeMenuItem) ? "active" : "" %>">
+                <a href="ShowtimeRevenueReportServlet" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-money"></i>
+                    <div data-i18n="ShowtimeRevenueReportServlet">ShowtimeRevenueReportServlet</div>
+                </a>
+            </li>
+
                 </ul>
             </li>
 
