@@ -38,27 +38,34 @@ public class ShowtimeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            String action = request.getParameter("action");
-            long id = Long.parseLong(request.getParameter("id"));
-            long roomId = Long.parseLong(request.getParameter("room_id"));
-            long movieId = Long.parseLong(request.getParameter("movie_id"));
-            Timestamp startsAt = Timestamp.valueOf(request.getParameter("starts_at"));
-            Timestamp endsAt = Timestamp.valueOf(request.getParameter("ends_at"));
-            String status = request.getParameter("status");
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    try {
+        String action = request.getParameter("action");
+       // long id = Long.parseLong(request.getParameter("id"));
+        long roomId = Long.parseLong(request.getParameter("room_id"));
+        long movieId = Long.parseLong(request.getParameter("movie_id"));
+        Timestamp startsAt = Timestamp.valueOf(request.getParameter("starts_at"));
+        Timestamp endsAt = Timestamp.valueOf(request.getParameter("ends_at"));
+        String status = request.getParameter("status");
 
-            Showtime showtime = new Showtime(id, roomId, movieId, startsAt, endsAt,status);
+        Showtime showtime = new Showtime(roomId, movieId, startsAt, endsAt, status);
 
-            if (action != null && action.equals("update")) {
-                showtime.update();
-            } else {
-                showtime.create();
-            }
-
-            response.sendRedirect("showtime");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if ("update".equals(action)) {
+            showtime.update();
+        } else {
+            showtime.create();
         }
+
+        response.sendRedirect("showtime");
+        return;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+
+        // IMPORTANT: respond with an error (or redirect), but DO NOT try to forward after output
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        return;
     }
+}
+
 }

@@ -102,7 +102,7 @@ VALUES (
   (SELECT id FROM categorie WHERE LOWER(nom)='adulte'),
   (SELECT id FROM tarif WHERE LOWER(nom)='standard'),
   'FIXED',
-  5000
+  30000
 );
 
 INSERT INTO categorie_tarif_pricing (categorie_id, tarif_id, pricing_type, fixed_price)

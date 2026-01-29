@@ -105,11 +105,11 @@ public class Showtime {
                     +
                     "VALUES (?, ?, ?, ?, ?)";
             statement = connection.prepareStatement(sql);
-            statement.setLong(2, this.getRoomId());
-            statement.setLong(3, this.getMovieId());
-            statement.setTimestamp(4, this.getStartsAt());
-            statement.setTimestamp(5, this.getEndsAt());
-            statement.setString(7, (this.getStatus() == null) ? "SCHEDULED" : this.getStatus());
+            statement.setLong(1, this.getRoomId());
+            statement.setLong(2, this.getMovieId());
+            statement.setTimestamp(3, this.getStartsAt());
+            statement.setTimestamp(4, this.getEndsAt());
+            statement.setString(5, (this.getStatus() == null) ? "SCHEDULED" : this.getStatus());
             statement.executeUpdate();
         } finally {
             if (statement != null)

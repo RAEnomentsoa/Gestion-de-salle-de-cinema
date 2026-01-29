@@ -270,211 +270,244 @@ public class Pub {
         return totalPub - totalPaye;
     }
 
-
     public static List<Pub> getAllPubByIdShowtime(long showtimeId) throws Exception {
-    List<Pub> list = new ArrayList<>();
+        List<Pub> list = new ArrayList<>();
 
-    String sql = """
-        SELECT *
-        FROM pub
-        WHERE showtime_id = ?
-        ORDER BY id
-    """;
+        String sql = """
+                    SELECT *
+                    FROM pub
+                    WHERE showtime_id = ?
+                    ORDER BY id
+                """;
 
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-        ps.setLong(1, showtimeId);
+            ps.setLong(1, showtimeId);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Pub(
-                    rs.getLong("id"),
-                    rs.getLong("showtime_id"),
-                    rs.getLong("id_societe"),
-                    rs.getTimestamp("dates"),
-                    rs.getLong("id_prix")
-                ));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Pub(
+                            rs.getLong("id"),
+                            rs.getLong("showtime_id"),
+                            rs.getLong("id_societe"),
+                            rs.getTimestamp("dates"),
+                            rs.getLong("id_prix")));
+                }
             }
         }
+        return list;
     }
-    return list;
-}
 
+    public static double getTotalAPayer(long showtimeId) throws Exception {
 
-public static double getTotalAPayer(long showtimeId) throws Exception {
+        String sql = """
+                    SELECT COALESCE(SUM(pt.prix), 0) AS total
+                    FROM pub p
+                    JOIN pub_tarif pt ON p.id_prix = pt.id
+                    WHERE p.showtime_id = ?
+                """;
 
-    String sql = """
-        SELECT COALESCE(SUM(pt.prix), 0) AS total
-        FROM pub p
-        JOIN pub_tarif pt ON p.id_prix = pt.id
-        WHERE p.showtime_id = ?
-    """;
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setLong(1, showtimeId);
 
-        ps.setLong(1, showtimeId);
-
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("total");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total");
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
 
+    public static double getTotalAPayershowtime_societe(long showtimeId, long societeId) throws Exception {
 
+        String sql = """
+                    SELECT COALESCE(SUM(pt.prix), 0) AS total
+                    FROM pub p
+                    JOIN pub_tarif pt ON p.id_prix = pt.id
+                    WHERE p.showtime_id = ? and p.id_societe = ?
+                """;
 
-public static double getTotalMontantPayeByIdShowtime(
-        long showtimeId,
-        long societeId
-) throws Exception {
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-    String sql = """
-        SELECT COALESCE(SUM(pa.montant), 0) AS total_paye
-        FROM paiement pa
-        WHERE pa.id_societe = ?
-    """;
+            ps.setLong(1, showtimeId);
+            ps.setLong(2, societeId);
 
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
-
-        ps.setLong(1, societeId);
-
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("total_paye");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total");
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
 
+    public static double getTotalMontantPayeByIdShowtime(
+            long showtimeId,
+            long societeId) throws Exception {
 
+        String sql = """
+                    SELECT COALESCE(SUM(pa.montant), 0) AS total_paye
+                    FROM paiement pa
+                    WHERE pa.id_societe = ?
+                """;
 
-public static double getPourcentage(long showtimeId, long societeId) throws Exception {
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-    double totalAPayer = getTotalAPayer(showtimeId);
-    if (totalAPayer == 0) return 0;
+            ps.setLong(1, societeId);
 
-    double totalPaye = getTotalMontantPayeByIdShowtime(showtimeId, societeId);
-
-    return totalPaye / totalAPayer;
-}
-
-
-
-public double getPrixPub() throws Exception {
-
-    String sql = "SELECT prix FROM pub_tarif WHERE id = ?";
-
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
-
-        ps.setLong(1, id_prix);
-
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("prix");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total_paye");
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
+
+    public static double getTotalMontantPaye() throws Exception {
+
+        String sql = """
+                    SELECT COALESCE(SUM(pa.montant), 0) AS total_paye
+                    FROM paiement pa
+                """;
+
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
 
-
-public static double getTotalPubParSocieteParShowtime(
-        long societeId,
-        long showtimeId
-) throws SQLException {
-
-    String sql = """
-        SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
-        FROM pub p
-        JOIN pub_tarif pt ON p.id_prix = pt.id
-        LEFT JOIN societe s ON p.id_societe = s.id
-        WHERE p.id_societe = ?
-          AND p.showtime_id = ?
-    """;
-
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
-
-        ps.setLong(1, societeId);
-        ps.setLong(2, showtimeId);
-
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("total_pub");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total_paye");
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
 
+     
 
+    public static double getPourcentage(long showtimeId, long societeId) throws Exception {
 
+        double totalAPayer = getTotalAPayershowtime_societe(showtimeId, societeId);
+        if (totalAPayer == 0)
+            return 0;
 
-public static double getTotalPubParSociete(long societeId) throws SQLException {
+        double totalPaye = getTotalMontantPayeByIdShowtime(showtimeId, societeId);
 
-    String sql = """
-        SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
-        FROM pub p
-        JOIN pub_tarif pt ON p.id_prix = pt.id
-        LEFT JOIN societe s ON p.id_societe = s.id
-        WHERE p.id_societe = ?
-    """;
+        return totalPaye / totalAPayer;
+    }
 
-    try (Connection cn = DBConnection.getConnection();
-         PreparedStatement ps = cn.prepareStatement(sql)) {
+        public static double getPourcentage_showtime(long showtimeId) throws Exception {
 
-        ps.setLong(1, societeId);
+        double totalAPayer =  getTotalAPayer(showtimeId);
+        if (totalAPayer == 0)
+            return 0;
 
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("total_pub");
+        double totalPaye = getTotalMontantPaye();
+
+        return totalPaye / totalAPayer;
+    }
+
+    public double getPrixPub() throws Exception {
+
+        String sql = "SELECT prix FROM pub_tarif WHERE id = ?";
+
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setLong(1, id_prix);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("prix");
+                }
             }
         }
+        return 0;
     }
-    return 0;
-}
 
+    public static double getTotalPubParSocieteParShowtime(
+            long societeId,
+            long showtimeId) throws SQLException {
 
-public static double resteAPayerParSocieteParIdShowtime(
-        long societeId,
-        long showtimeId
-) throws Exception {
+        String sql = """
+                    SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
+                    FROM pub p
+                    JOIN pub_tarif pt ON p.id_prix = pt.id
+                    LEFT JOIN societe s ON p.id_societe = s.id
+                    WHERE p.id_societe = ?
+                      AND p.showtime_id = ?
+                """;
 
-    // 1. Total pub pour ce showtime
-    double totalPubShowtime =
-            getTotalPubParSocieteParShowtime(societeId, showtimeId);
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-    if (totalPubShowtime == 0) return 0;
+            ps.setLong(1, societeId);
+            ps.setLong(2, showtimeId);
 
-    // 2. Total pub global société
-    double totalPubSociete =
-            getTotalPubParSociete(societeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total_pub");
+                }
+            }
+        }
+        return 0;
+    }
 
-    if (totalPubSociete == 0) return totalPubShowtime;
+    public static double getTotalPubParSociete(long societeId) throws SQLException {
 
-    // 3. Total payé global société
-    double totalPaye =
-            getTotalMontantPayeByIdShowtime(showtimeId, societeId);
+        String sql = """
+                    SELECT COALESCE(SUM(COALESCE(s.prix, pt.prix)), 0) AS total_pub
+                    FROM pub p
+                    JOIN pub_tarif pt ON p.id_prix = pt.id
+                    LEFT JOIN societe s ON p.id_societe = s.id
+                    WHERE p.id_societe = ?
+                """;
 
-    // 4. Part payée pour ce showtime (proportionnelle)
-    double partPayeShowtime =
-            (totalPubShowtime / totalPubSociete) * totalPaye;
+        try (Connection cn = DBConnection.getConnection();
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
-    // 5. Reste à payer
-    return totalPubShowtime - partPayeShowtime;
-}
+            ps.setLong(1, societeId);
 
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("total_pub");
+                }
+            }
+        }
+        return 0;
+    }
 
+    public static double resteAPayerParSocieteParIdShowtime(
+            long societeId,
+            long showtimeId) throws Exception {
 
+        // 1. Total pub pour ce showtime
+        double totalPubShowtime = getTotalPubParSocieteParShowtime(societeId, showtimeId);
 
+        if (totalPubShowtime == 0)
+            return 0;
 
+        // 2. Total pub global société
+        double totalPubSociete = getTotalPubParSociete(societeId);
+
+        if (totalPubSociete == 0)
+            return totalPubShowtime;
+
+        // 3. Total payé global société
+        double totalPaye = getTotalMontantPayeByIdShowtime(showtimeId, societeId);
+
+        // 4. Part payée pour ce showtime (proportionnelle)
+        double partPayeShowtime = (totalPubShowtime / totalPubSociete) * totalPaye;
+
+        // 5. Reste à payer
+        return totalPubShowtime - partPayeShowtime;
+    }
 
 }

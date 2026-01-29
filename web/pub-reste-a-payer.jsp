@@ -22,12 +22,14 @@
      * une showtime correspond à une seule société dans ton concept)
      */
     double pourcentage = 0;
-    if (pubs != null && !pubs.isEmpty()) {
-        pourcentage = Pub.getPourcentage(
-            showtimeId,
-            pubs.get(0).getId_societe()
-        );
-    }
+    // if (pubs != null && !pubs.isEmpty()) {
+    //     pourcentage = Pub.getPourcentage(
+    //         showtimeId,
+    //         pubs.get(0).getId_societe()
+    //     );
+    // }
+
+   
 %>
 
 <div class="layout-wrapper layout-content-navbar">
@@ -72,11 +74,13 @@
                     <%
                         if (pubs != null) {
                             for (Pub p : pubs) {
+                                pourcentage = Pub.getPourcentage(showtimeId,p.getId_societe());
 
                                 double prixPub = p.getPrixPub();
+                                
                                 double montantPayeSurPub = prixPub * pourcentage;
                                 double resteAPayer = prixPub - montantPayeSurPub;
-                    %>
+                    %> <%=  pourcentage %>
                         <tr>
                             <td><strong><%= p.getId() %></strong></td>
                             <td><%= p.getShowtime_id() %></td>

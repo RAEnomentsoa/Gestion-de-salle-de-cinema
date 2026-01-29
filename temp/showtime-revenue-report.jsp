@@ -10,6 +10,8 @@
     Double totalRevenue =
         (Double) request.getAttribute("totalRevenue");
     if (totalRevenue == null) totalRevenue = 0.0;
+
+    Double pourcentage = 0.0;
 %>
 
 <%@ include file="header.jsp" %>
@@ -59,11 +61,14 @@
                   </tr>
                 <% } else {
                      for (ShowtimeRevenueRow r : rows) { 
+                        
                          long showtimeId = r.getShowtimeId();
                          long societeId = r.getSocieteId(); // Assure-toi que cette propriété existe dans ShowtimeRevenueRow
+                         pourcentage = Pub.getPourcentage_showtime(showtimeId);
+                         double somme_prixpub = Pub.getTotalAPayer(showtimeId);
                          double montantPaye = 0.0;
                          try {
-                             montantPaye = Pub.getTotalMontantPayeByIdShowtime(showtimeId, societeId);
+                             montantPaye = (somme_prixpub * pourcentage) +  r.getTicketRevenue();
                          } catch (Exception e) {
                              montantPaye = 0.0;
                          }
@@ -73,8 +78,8 @@
                     <td><%= r.getMovieTitle() %></td>
                     <td><%= r.getStartsAt() %></td>
                     <td><%= String.format("%,.2f", r.getTicketRevenue()) %> Ar</td>
-                    <td><%= String.format("%,.2f", montantPaye) %> Ar</td>
                     <td><%= String.format("%,.2f", resteAPayer) %> Ar</td>
+                    <td><%= String.format("%,.2f", montantPaye) %> Ar</td>
                     <td class="fw-bold text-success">
                         <%= String.format("%,.2f", r.getTotalRevenue()) %> Ar
                     </td>
